@@ -16,7 +16,7 @@ from .database import connect, one, rows, upsert_notice
 from .extractor import DeepSeekExtractor, PIPELINE_VERSION
 from .ingestion import discover_uploads, input_digest, notice_metadata
 from .models import JobState, ProjectExtract
-from .parsers import PARSER_VERSION, expand_archives, parse_file
+from .parsers import PARSER_VERSION, PARSE_WARNING_PREFIX, expand_archives, parse_file
 from .prompts import SYSTEM_PROMPT
 
 TERMINAL = {'completed','completed_with_warnings','completed_with_errors','failed','interrupted'}
@@ -157,6 +157,8 @@ async def process_job(job_id: str, uploads: list[Path] | None=None, workdir: Pat
                             try:
                                 text = await asyncio.to_thread(parse_file,path)
                                 details.append({'file':path.name,'characters':len(text)})
+                                errors.extend(f'{path.name}: {line[len(PARSE_WARNING_PREFIX):]}'
+                                              for line in text.splitlines() if line.startswith(PARSE_WARNING_PREFIX))
                             except Exception as exc:
                                 errors.append(f'{path.name}: {type(exc).__name__}: {str(exc)[:160]}')
                         if not details:

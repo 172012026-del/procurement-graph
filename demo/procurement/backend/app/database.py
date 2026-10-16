@@ -8,7 +8,7 @@ from typing import Iterator
 
 from .config import settings
 from .models import ProjectExtract
-from .normalization import lot_identity
+from .normalization import lot_identity, model_match_key
 
 # A projects row is a procurement package. notice_uuid groups its parent notice.
 SCHEMA = """
@@ -68,7 +68,8 @@ ADDITIONS = {
  'items': {'line_id': "TEXT NOT NULL DEFAULT ''", 'source_file': "TEXT NOT NULL DEFAULT ''",
   'source_location': "TEXT NOT NULL DEFAULT ''", 'quantity_unit': "TEXT NOT NULL DEFAULT ''",
   'derived_values': "TEXT NOT NULL DEFAULT '{}'", 'business_line_id': "TEXT NOT NULL DEFAULT ''",
-  'related_sources': "TEXT NOT NULL DEFAULT '[]'"},
+  'related_sources': "TEXT NOT NULL DEFAULT '[]'",
+   'model_key': "TEXT NOT NULL DEFAULT ''"},
 }
 
 
@@ -145,8 +146,13 @@ def init_db() -> None:
         CREATE INDEX IF NOT EXISTS idx_bids_winner ON bids(is_winner,bidder);
         CREATE INDEX IF NOT EXISTS idx_items_project ON items(project_id);
         CREATE INDEX IF NOT EXISTS idx_items_search ON items(product_name,category,brand);
-        PRAGMA user_version=3;
+        CREATE INDEX IF NOT EXISTS idx_items_model_key ON items(model_key);
+        PRAGMA user_version=4;
         """)
+        for row in c.execute('SELECT id, model, model_key FROM items').fetchall():
+            key = model_match_key(row['model'])
+            if key != row['model_key']:
+                c.execute('UPDATE items SET model_key=? WHERE id=?', (key, row['id']))
 
 
 def upsert_notice(result: ProjectExtract, source_files: list[str], dataset_id: str = 'default') -> list[int]:
@@ -192,10 +198,10 @@ def upsert_notice(result: ProjectExtract, source_files: list[str], dataset_id: s
                 (project_id,b.bidder,int(b.is_winner),b.bid_amount,b.score,b.rank,b.evidence,b.review_status,
                  b.qualification_status,b.compliance_status,int(b.eligible),b.review_reason,b.non_winning_reason,b.consortium_id,b.source_file,json.dumps(b.evaluation_scores))
                 for b in lot.bids if b.bidder])
-            c.executemany("""INSERT INTO items(project_id,winner_supplier,product_name,category,brand,model,unit_price,
+            c.executemany("""INSERT INTO items(project_id,winner_supplier,product_name,category,brand,model,model_key,unit_price,
                 quantity,total_price,source,evidence,confidence,line_id,source_file,source_location,quantity_unit,derived_values,business_line_id,related_sources)
-                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", [
-                (project_id,i.supplier,i.product_name,i.category,i.brand,i.model,i.unit_price,i.quantity,i.total_price,
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", [
+                (project_id,i.supplier,i.product_name,i.category,i.brand,i.model,i.model_key,i.unit_price,i.quantity,i.total_price,
                  i.source,i.evidence,i.confidence,i.line_id,i.source_file,i.source_location,i.quantity_unit,
                  json.dumps(i.derived_values,ensure_ascii=False),i.business_line_id,
                  json.dumps(i.related_sources,ensure_ascii=False)) for i in lot.items])

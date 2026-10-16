@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Iterable
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 from docx import Document
 from openpyxl import load_workbook
 from PIL import Image
@@ -26,7 +26,7 @@ from .config import WORKSPACE, settings
 from .normalization import clean_text
 
 SUPPORTED = {'.html','.htm','.pdf','.doc','.docx','.xls','.xlsx','.txt','.csv','.png','.jpg','.jpeg','.webp','.wps','.rtf'}
-PARSER_VERSION = 'parse-v3.4'
+PARSER_VERSION = 'parse-v3.6'
 PARSE_WARNING_PREFIX = '[PARSE_WARNING] '
 _GOODS_FIELDS = ('货物名称', '货物品牌', '货物型号', '货物数量', '货物单价')
 _ITEM_SEPARATOR = re.compile(r'[；;]')
@@ -288,6 +288,32 @@ def _table_rows(rows: Iterable[tuple[int, list[str]]], table_index: int) -> Iter
         yield f'[{location}] ' + ' | '.join(cells)
 
 
+def _html_cell_text(cell) -> str:
+    """Preserve source spaces and block boundaries; join hyphenated wraps only."""
+    parts = []
+    stack = list(reversed(list(cell.children)))
+    while stack:
+        node = stack.pop()
+        if isinstance(node, Comment):
+            continue
+        elif isinstance(node, NavigableString):
+            parts.append(str(node))
+        elif isinstance(node, str):
+            parts.append(node)  # Closing block boundary queued below.
+        elif isinstance(node, Tag) and node.name not in {'script', 'style', 'noscript'}:
+            if node.name == 'br':
+                parts.append('\n')
+                continue
+            if node.name in {'p', 'div', 'li', 'ul', 'ol', 'section', 'h1', 'h2', 'h3'}:
+                parts.append('\n')
+                stack.append('\n')
+            stack.extend(reversed(list(node.children)))
+    text = ''.join(parts)
+    text = re.sub(r'(?<=[A-Za-z0-9])[ \t\r]*\n\s*(?=-[A-Za-z0-9])', '', text)
+    text = re.sub(r'(?<=[A-Za-z0-9]-)[ \t\r]*\n\s*(?=[A-Za-z0-9])', '', text)
+    return re.sub(r'\s+', ' ', text).strip()
+
+
 def _html(path: Path) -> str:
     soup = BeautifulSoup(decode_text(path.read_bytes()),'lxml')
     if any(word in soup.get_text() for word in ('系统正在维护中','Access Denied','403 Forbidden','404 Not Found')):
@@ -310,7 +336,7 @@ def _html(path: Path) -> str:
             for cell in tr.find_all(['th','td'],recursive=False):
                 while (row_index,col) in pending:
                     cells.append(pending[(row_index,col)]); col += 1
-                text = cell.get_text(' ',strip=True)
+                text = _html_cell_text(cell)
                 colspan = max(1,min(100,int(cell.get('colspan',1))))
                 rowspan = max(1,min(100,int(cell.get('rowspan',1))))
                 for _ in range(colspan):

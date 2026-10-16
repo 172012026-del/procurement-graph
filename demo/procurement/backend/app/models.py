@@ -1,13 +1,34 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 from pydantic import BaseModel, Field, PrivateAttr, field_validator, model_validator
 
-from .normalization import disclosed_text, has_parallel_numbers, lot_identity, money_to_yuan, number_value, review_status
+from .normalization import disclosed_text, has_parallel_numbers, lot_identity, model_match_key, money_to_yuan, number_value, review_status
 
 
 class ExtractionModel(BaseModel):
+    _normalization_warnings: list[str] = PrivateAttr(default_factory=list)
+    _numeric_fields: ClassVar[dict[str, str]] = {}
+    _numeric_subject: ClassVar[tuple[str, str]] = ('记录', '')
+
+    @model_validator(mode='wrap')
+    @classmethod
+    def flag_parallel_numbers(cls, values, handler):
+        record = handler(values)
+        if isinstance(values, dict):
+            label, name_field = cls._numeric_subject
+            name = getattr(record, name_field, '') or '未命名'
+            for field, field_label in cls._numeric_fields.items():
+                if has_parallel_numbers(values.get(field)):
+                    message = f'{label}“{name}”的{field_label}含分号并列数值，已置空而非取第一段，需拆分核验：{str(values[field])[:240]}'
+                    if message not in record._normalization_warnings:
+                        record._normalization_warnings.append(message)
+        return record.collect_numeric_warnings()
+
+    def collect_numeric_warnings(self):
+        return self
+
     @model_validator(mode='before')
     @classmethod
     def normalize_missing_values(cls, values):
@@ -24,13 +45,15 @@ class ExtractionModel(BaseModel):
 
 
 class ItemExtract(ExtractionModel):
-    _normalization_warnings: list[str] = PrivateAttr(default_factory=list)
+    _numeric_fields = {'unit_price': '单价', 'quantity': '数量', 'total_price': '总价'}
+    _numeric_subject = ('标的', 'product_name')
     lot_name: str = ""
     line_id: str = ""
     product_name: str = ""
     category: str = ""
     brand: str = ""
     model: str = ""
+    model_key: str = ""  # Exact-match key; never replaces the source model text.
     unit_price: float | None = None
     quantity: float | None = None
     total_price: float | None = None
@@ -46,22 +69,21 @@ class ItemExtract(ExtractionModel):
     related_sources: list[dict[str, str]] = Field(default_factory=list)
     source_context: dict[str, str] = Field(default_factory=dict)
 
-    @model_validator(mode='wrap')
-    @classmethod
-    def flag_parallel_numbers(cls, values, handler):
-        item = handler(values)
-        if isinstance(values, dict):
-            for field, label in (('unit_price', '单价'), ('quantity', '数量'), ('total_price', '总价')):
-                if has_parallel_numbers(values.get(field)):
-                    message = f'标的“{item.product_name or "未命名"}”的{label}含分号并列数值，已置空而非取第一段，需拆分核验：{str(values[field])[:240]}'
-                    if message not in item._normalization_warnings:
-                        item._normalization_warnings.append(message)
-        return item
-
     @field_validator('product_name', 'category', 'brand', 'model', mode='before')
     @classmethod
     def actual_value(cls, value):
         return disclosed_text(value)
+
+    @model_validator(mode='after')
+    def align_model_key(self):
+        self.model_key = model_match_key(self.model)
+        return self
+
+    def model_dump(self, **kwargs):
+        excluded = kwargs.pop('exclude', None)
+        excluded = set(excluded or ())
+        excluded.add('model_key')
+        return super().model_dump(exclude=excluded, **kwargs)
 
     @field_validator("unit_price", "total_price", mode="before")
     @classmethod
@@ -80,6 +102,8 @@ class ItemExtract(ExtractionModel):
 
 
 class BidExtract(ExtractionModel):
+    _numeric_fields = {'bid_amount': '报价', 'score': '得分'}
+    _numeric_subject = ('投标人', 'bidder')
     bidder: str
     lot_name: str = ""
     is_winner: bool = False
@@ -158,6 +182,8 @@ class BidExtract(ExtractionModel):
 
 
 class LotExtract(ExtractionModel):
+    _numeric_fields = {'budget_amount': '预算金额', 'awarded_amount': '中标金额'}
+    _numeric_subject = ('采购包', 'lot_name')
     lot_name: str = ""
     lot_key: str = ""  # Internal identity; never replaces the source label in competition sheets.
     budget_amount: float | None = None
@@ -172,6 +198,8 @@ class LotExtract(ExtractionModel):
 
 
 class ProjectExtract(ExtractionModel):
+    _numeric_fields = {'budget_amount': '预算金额', 'awarded_amount': '中标金额'}
+    _numeric_subject = ('项目', 'project_name')
     notice_uuid: str = ""
     source_url: str = ""
     lot_name: str = ""
@@ -191,10 +219,11 @@ class ProjectExtract(ExtractionModel):
     input_hash: str = ""
     model_usage: dict[str, Any] = Field(default_factory=dict)
 
-    @model_validator(mode='after')
     def collect_numeric_warnings(self):
-        warnings = [warning for item in [*self.items, *(item for lot in self.lots for item in lot.items)]
-                    for warning in item._normalization_warnings]
+        records = [self, *self.items, *self.bids, *self.lots,
+                   *(item for lot in self.lots for item in lot.items),
+                   *(bid for lot in self.lots for bid in lot.bids)]
+        warnings = [warning for record in records for warning in record._normalization_warnings]
         if warnings:
             self.warnings = list(dict.fromkeys([*self.warnings, *warnings]))
             if self.processing_status == 'complete':

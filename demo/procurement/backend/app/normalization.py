@@ -7,6 +7,11 @@ from decimal import Decimal, InvalidOperation
 
 
 MONEY_UNITS = {"亿元": Decimal("100000000"), "亿": Decimal("100000000"), "万元": Decimal("10000"), "万": Decimal("10000"), "千元": Decimal("1000"), "千": Decimal("1000"), "元": Decimal("1")}
+_DURATION = r'\d+(?:\.\d+)?\s*(?:个)?(?:工作日|日历日|天|日|月|年)'
+_DURATION_NOTE = re.compile(
+    rf'(?:(?:交货|交付|供货|质保|保修|工期|报价有效期|有效期|服务期|履约期)(?:期|期限)?\s*[:：]?\s*{_DURATION}(?:以内|内)?'
+    rf'|{_DURATION}(?:以内|内)?\s*(?:交货|交付|供货|质保|保修))'
+)
 
 
 def clean_text(text: str) -> str:
@@ -16,10 +21,19 @@ def clean_text(text: str) -> str:
     return text.strip()
 
 
+def _numeric_text(value: object) -> str:
+    # Ignore only explicit, whole-segment duration notes. Unknown numeric
+    # annotations remain ambiguous instead of being silently discarded.
+    parts = re.split(r'[;；]', unicodedata.normalize('NFKC', str(value)))
+    if len(parts) == 1:
+        return parts[0]
+    return ';'.join(part for part in parts if not _DURATION_NOTE.fullmatch(part.strip()))
+
+
 def has_parallel_numbers(value: object) -> bool:
     if not isinstance(value, str):
         return False
-    parts = re.split(r'[;；]', unicodedata.normalize('NFKC', value))
+    parts = _numeric_text(value).split(';')
     return sum(bool(re.search(r'\d', part)) for part in parts) > 1
 
 
@@ -30,7 +44,7 @@ def money_to_yuan(value: object) -> float | None:
         return float(value) if math.isfinite(value) else None
     if has_parallel_numbers(value):
         return None
-    raw = unicodedata.normalize("NFKC", str(value)).replace(",", "").replace("¥", "").strip()
+    raw = _numeric_text(value).replace(",", "").replace("¥", "").strip()
     if re.search(r'[%‰]|费率|折扣|下浮|美元|欧元|USD|EUR',raw,re.I) or re.search(r'\d\s*(?:-|—|~|至|到)\s*\d',raw):
         return None  # A percentage/range/foreign currency cannot be treated as a disclosed yuan amount.
     match = re.search(r"(-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*[（(]?\s*(亿元|亿|万元|万|千元|千|元)?", raw)
@@ -52,7 +66,7 @@ def number_value(value: object) -> float | None:
         return float(value) if math.isfinite(value) else None
     if has_parallel_numbers(value):
         return None
-    match = re.search(r"-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", str(value).replace(",", ""))
+    match = re.search(r"-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", _numeric_text(value).replace(",", ""))
     result = float(match.group()) if match else None
     return result if result is None or math.isfinite(result) else None
 
@@ -60,6 +74,12 @@ def number_value(value: object) -> float | None:
 def normalize_org(name: str) -> str:
     value = re.sub(r"\s+", "", unicodedata.normalize("NFKC", name or ""))
     return value.strip("，,。;；:：")
+
+
+def model_match_key(value: object) -> str:
+    """Whitespace-insensitive exact-match key. Display text stays unchanged."""
+    text = str(value or "").replace("\u3000", " ").replace("\xa0", " ")
+    return re.sub(r"\s+", "", text)
 
 
 def dedupe_key(*values: object) -> str:
