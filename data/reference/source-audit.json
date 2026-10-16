@@ -1,0 +1,106 @@
+{
+  "status": "programmatic-source-check-human-review-pending",
+  "source_hashes_verified": 20,
+  "rows_reviewed": 79,
+  "changes_before_model_predictions": [
+    {
+      "notice_uuid": "t20260807_27093889",
+      "line_id": "TABLE:3 ROW:7",
+      "field": "model",
+      "source_value": "——",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260212_26174259",
+      "line_id": "TABLE:3 ROW:2",
+      "field": "brand",
+      "source_value": "满足本项目磋商文件要求",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260212_26174259",
+      "line_id": "TABLE:3 ROW:2",
+      "field": "model",
+      "source_value": "满足本项目磋商文件要求",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260509_26533549",
+      "line_id": "TABLE:4 ROW:2",
+      "field": "brand",
+      "source_value": "详见详细分项报价表",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260509_26533549",
+      "line_id": "TABLE:4 ROW:2",
+      "field": "model",
+      "source_value": "详见详细分项报价表",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260509_26533549",
+      "line_id": "TABLE:5 ROW:2",
+      "field": "brand",
+      "source_value": "详见详细分项报价表",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260509_26533549",
+      "line_id": "TABLE:5 ROW:2",
+      "field": "model",
+      "source_value": "详见详细分项报价表",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260809_27099966",
+      "line_id": "TABLE:3 ROW:2",
+      "field": "brand",
+      "source_value": "满足招标文件要求，详见投标文件“三、分项报价表”",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260809_27099966",
+      "line_id": "TABLE:3 ROW:2",
+      "field": "model",
+      "source_value": "满足招标文件要求，详见投标文件“三、分项报价表”",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260212_26175071",
+      "line_id": "TABLE:3 ROW:3",
+      "field": "brand",
+      "source_value": "详见投标文件",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260212_26175071",
+      "line_id": "TABLE:3 ROW:3",
+      "field": "model",
+      "source_value": "详见投标文件",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260612_26740585",
+      "line_id": "TABLE:3 ROW:3",
+      "field": "product_name",
+      "source_value": "详见投标文件中的分项报价表",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260612_26740585",
+      "line_id": "TABLE:3 ROW:3",
+      "field": "brand",
+      "source_value": "详见投标文件中的分项报价表",
+      "reference_value": ""
+    },
+    {
+      "notice_uuid": "t20260612_26740585",
+      "line_id": "TABLE:3 ROW:3",
+      "field": "model",
+      "source_value": "详见投标文件中的分项报价表",
+      "reference_value": ""
+    }
+  ],
+  "reference_sha256": "e780b32d0cf3a5279d65f377d4f2d0fb25e1d3a25e80eb71ba7a6be3793e177b"
+}

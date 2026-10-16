@@ -1,0 +1,324 @@
+[
+  {
+    "sheet": "总表",
+    "used_range": "A1:H23",
+    "required_blue_count": 7,
+    "fields": [
+      {
+        "column": "A",
+        "name": "序号",
+        "required_blue": false,
+        "instruction_cell": "A2",
+        "instruction": "该字段无实际含义，仅用于区分填写说明和填写示例",
+        "example": "填写示例"
+      },
+      {
+        "column": "B",
+        "name": "URL",
+        "required_blue": true,
+        "instruction_cell": "B2",
+        "instruction": "HTML文件的源地址",
+        "example": "https://www.ccgp.gov.cn/cggg/zygg/zbgg/202602/t20260202_26141082.htm"
+      },
+      {
+        "column": "C",
+        "name": "UUID",
+        "required_blue": true,
+        "instruction_cell": "C2",
+        "instruction": "公告唯一标识：与源文件（HTML/附件）前缀一致，由任务给定，不得自行编造。",
+        "example": "t20260202_26141082"
+      },
+      {
+        "column": "D",
+        "name": "标段/合同包",
+        "required_blue": true,
+        "instruction_cell": "D2",
+        "instruction": "公告划分的标段/合同包名称；未分包的填写\"未分包\"，多标段逐行列出。",
+        "example": "一标段"
+      },
+      {
+        "column": "E",
+        "name": "项目名称",
+        "required_blue": true,
+        "instruction_cell": "E2",
+        "instruction": "采购项目全称，保留公告原文，不得缩写。",
+        "example": "哈尔滨工业大学二校区B08公寓周边监控设备采购"
+      },
+      {
+        "column": "F",
+        "name": "采购单位",
+        "required_blue": true,
+        "instruction_cell": "F2",
+        "instruction": "采购人（招标人）全称。",
+        "example": "哈尔滨工业大学"
+      },
+      {
+        "column": "G",
+        "name": "中标供应商",
+        "required_blue": true,
+        "instruction_cell": "G2",
+        "instruction": "中标（成交）供应商全称。",
+        "example": "黑龙江品泰科技有限公司"
+      },
+      {
+        "column": "H",
+        "name": "中标金额",
+        "required_blue": true,
+        "instruction_cell": "H2",
+        "instruction": "中标金额：统一金额单位为（万元），保留两位小数，四舍五入。",
+        "example": 94.53
+      }
+    ],
+    "sample_row_count": 4,
+    "sample_rows_first_two": [
+      [
+        "示例数据1",
+        "https://www.ccgp.gov.cn/cggg/zygg/zbgg/202602/t20260202_26141082.htm",
+        "t20260202_26141082_01",
+        "一标段",
+        "哈尔滨工业大学二校区B08公寓周边监控设备采购",
+        "哈尔滨工业大学",
+        "黑龙江品泰科技有限公司",
+        94.53
+      ],
+      [
+        "示例数据1",
+        "https://www.ccgp.gov.cn/cggg/zygg/zbgg/202602/t20260202_26141082.htm",
+        "t20260202_26141082_02",
+        "三标段",
+        "哈尔滨工业大学二校区B08公寓周边监控设备采购",
+        "哈尔滨工业大学",
+        "黑龙江省凯博电子设备有限公司",
+        95.2
+      ]
+    ]
+  },
+  {
+    "sheet": "标的表",
+    "used_range": "A1:K77",
+    "required_blue_count": 9,
+    "fields": [
+      {
+        "column": "A",
+        "name": "序号",
+        "required_blue": false,
+        "instruction_cell": "A2",
+        "instruction": "该字段无实际含义，仅用于区分填写说明和填写示例",
+        "example": "填写示例"
+      },
+      {
+        "column": "B",
+        "name": "UUID",
+        "required_blue": true,
+        "instruction_cell": "B2",
+        "instruction": "公告唯一标识：与源文件（HTML/附件）前缀一致，由任务给定，不得自行编造。",
+        "example": "t20260202_26141082"
+      },
+      {
+        "column": "C",
+        "name": "标段/合同包",
+        "required_blue": true,
+        "instruction_cell": "C2",
+        "instruction": "公告划分的标段/合同包名称；未分包的填写\"未分包\"，多标段逐行列出。",
+        "example": "一标段"
+      },
+      {
+        "column": "D",
+        "name": "产品服务名称",
+        "required_blue": true,
+        "instruction_cell": "D2",
+        "instruction": "标的物名称，保留原文（含\"核心产品\"等标注）；一条标的一行。",
+        "example": "400万智能枪式网络摄像机（核心产品）"
+      },
+      {
+        "column": "E",
+        "name": "品目",
+        "required_blue": true,
+        "instruction_cell": "E2",
+        "instruction": "按政府采购品目分类目录划分的采购项目类别，原文未给出则留空。",
+        "example": "信息化设备"
+      },
+      {
+        "column": "F",
+        "name": "品牌",
+        "required_blue": true,
+        "instruction_cell": "F2",
+        "instruction": "品牌名，原文未给出则留空。",
+        "example": "宇视"
+      },
+      {
+        "column": "G",
+        "name": "规格型号",
+        "required_blue": true,
+        "instruction_cell": "G2",
+        "instruction": "规格/型号，原文未给出则留空。",
+        "example": "IPC-E244-FW"
+      },
+      {
+        "column": "H",
+        "name": "数量",
+        "required_blue": true,
+        "instruction_cell": "H2",
+        "instruction": "数量：正整数，照录原文。原文未给出则留空。",
+        "example": "254"
+      },
+      {
+        "column": "I",
+        "name": "单价",
+        "required_blue": true,
+        "instruction_cell": "I2",
+        "instruction": "单价：单位(万元)。原文未给出则留空。",
+        "example": 0.093
+      },
+      {
+        "column": "J",
+        "name": "总价",
+        "required_blue": true,
+        "instruction_cell": "J2",
+        "instruction": "总价：单价×数量，或按原文填写，单位（万元）。原文未给出则留空。",
+        "example": 23.62
+      },
+      {
+        "column": "K",
+        "name": "类别",
+        "required_blue": false,
+        "instruction_cell": "K2",
+        "instruction": "记录的类别，属于结果公示提取的，记为需求，属于招标类提取的，记为中标",
+        "example": null
+      }
+    ],
+    "sample_row_count": 74,
+    "sample_rows_first_two": [
+      [
+        "示例数据1",
+        "t20260202_26141082_01",
+        "一标段",
+        "6米立杆",
+        null,
+        "顺腾",
+        "6米",
+        "12",
+        0.09,
+        1.08,
+        "中标"
+      ],
+      [
+        "示例数据1",
+        "t20260202_26141082_01",
+        "一标段",
+        "400万智能枪式网络摄像机（核心产品）",
+        null,
+        "宇视",
+        "IPC-E244-FW",
+        "254",
+        0.093,
+        23.622,
+        "中标"
+      ]
+    ]
+  },
+  {
+    "sheet": "投标人表",
+    "used_range": "A1:I23",
+    "required_blue_count": 6,
+    "fields": [
+      {
+        "column": "A",
+        "name": "序号",
+        "required_blue": false,
+        "instruction_cell": "A2",
+        "instruction": "该字段无实际含义，仅用于区分填写说明和填写示例",
+        "example": "填写示例"
+      },
+      {
+        "column": "B",
+        "name": "UUID",
+        "required_blue": true,
+        "instruction_cell": "B2",
+        "instruction": "公告唯一标识：与源文件（HTML/附件）前缀一致，由任务给定，不得自行编造。",
+        "example": "t20260202_26141082"
+      },
+      {
+        "column": "C",
+        "name": "标段/合同包",
+        "required_blue": true,
+        "instruction_cell": "C2",
+        "instruction": "公告划分的标段/合同包名称；未分包的填写\"未分包\"，多标段逐行列出。",
+        "example": "一标段"
+      },
+      {
+        "column": "D",
+        "name": "名称",
+        "required_blue": true,
+        "instruction_cell": "D2",
+        "instruction": "参与投标/响应的供应商全称。",
+        "example": "哈尔滨瀚岚鸿图智能科技发展有限公司"
+      },
+      {
+        "column": "E",
+        "name": "类别",
+        "required_blue": true,
+        "instruction_cell": "E2",
+        "instruction": "中标人 / 参与人（中标公示中的中标方填\"中标人\"，其余填\"参与人\"，未通过审查的填写\"其他\"）。",
+        "example": "参与人"
+      },
+      {
+        "column": "F",
+        "name": "通过审查",
+        "required_blue": true,
+        "instruction_cell": "F2",
+        "instruction": "资格审查/符合性审查结果：通过 / 未通过，未通过需注明原因。",
+        "example": "通过"
+      },
+      {
+        "column": "G",
+        "name": "报价（万元）",
+        "required_blue": true,
+        "instruction_cell": "G2",
+        "instruction": "投标报价，统一单位为（万元），保留两位小数点。原文未披露则留空，",
+        "example": 94.53
+      },
+      {
+        "column": "H",
+        "name": "得分",
+        "required_blue": false,
+        "instruction_cell": "H2",
+        "instruction": "综合得分，保留两位小数，原文未披露则留空。",
+        "example": 88.41
+      },
+      {
+        "column": "I",
+        "name": "未中标原因",
+        "required_blue": false,
+        "instruction_cell": "I2",
+        "instruction": "建议仅非中标人填写：照录原文，原文无则留空。",
+        "example": "综合得分排名第二，未中标"
+      }
+    ],
+    "sample_row_count": 14,
+    "sample_rows_first_two": [
+      [
+        "示例数据1",
+        "t20260202_26141082_01",
+        "一标段",
+        "黑龙江品泰科技有限公司",
+        "中标人",
+        "通过",
+        94.53,
+        100,
+        null
+      ],
+      [
+        "示例数据1",
+        "t20260202_26141082_01",
+        "一标段",
+        "哈尔滨瀚岚鸿图智能科技发展有限公司",
+        "参与人",
+        "通过",
+        null,
+        88.41,
+        null
+      ]
+    ]
+  }
+]

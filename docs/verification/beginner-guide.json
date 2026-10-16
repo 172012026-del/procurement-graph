@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "version": "2.4.0",
+  "scope": "Live restarted local service; read-only guide walkthrough; all mutation and external requests blocked",
+  "checks": [
+    "Sample overview: 20 notices, 26 packages and 138 items",
+    "Model configuration: 2.4.0, enabled, existing key recognized without exposure",
+    "Project lookup and detail tabs",
+    "Hierarchy empty state correctly explained for bundled source-only sample",
+    "Item model filter and source evidence",
+    "Cooperation example yields source-backed suppliers",
+    "Upload and bundled sample controls match guide; no tasks submitted"
+  ],
+  "modelRequests": 0,
+  "consoleErrors": [],
+  "blockedRequests": [],
+  "finished": "2026-10-16T10:02:42.768Z"
+}

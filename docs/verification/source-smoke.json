@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "application_version": "2.4.0",
+  "notices": 20,
+  "packages": 26,
+  "cache_hits": 20,
+  "model_requests": 0,
+  "workbook_bytes": 32434,
+  "database": "fresh",
+  "official_input": "absent",
+  "checked_at": "2026-10-16T18:37:02.500063+08:00",
+  "temporary_source_removed": true,
+  "scope": "Clean extracted source; existing Python dependencies; not a fresh dependency installation or official platform test"
+}

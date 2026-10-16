@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "tests": 185,
+  "failures": 0,
+  "errors": 0,
+  "seconds": 13.98,
+  "application_version": "2.4.0",
+  "scope": "Isolated fixtures and MockTransport; no provider HTTP or official accuracy claim"
+}

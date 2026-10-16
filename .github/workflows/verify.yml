@@ -1,0 +1,69 @@
+name: Verify project
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      MODEL_NETWORK_ENABLED: 'false'
+      DEEPSEEK_API_KEY: ''
+    services:
+      neo4j:
+        image: neo4j:5.26-community
+        env:
+          NEO4J_AUTH: neo4j/ci-ephemeral-graph
+          NEO4J_PASSWORD: ci-ephemeral-graph
+        ports:
+          - 7687:7687
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p ci-ephemeral-graph 'RETURN 1'"
+          --health-interval 10s --health-timeout 5s --health-retries 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Install native parsers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libreoffice-writer libreoffice-calc 7zip antiword tesseract-ocr tesseract-ocr-chi-sim fonts-noto-cjk
+      - name: Install application
+        run: python scripts/manage_project.py setup
+      - name: Diagnose and test
+        run: |
+          python scripts/manage_project.py doctor --require-tools
+          python scripts/manage_project.py test
+      - name: Browser checks with fresh fixtures
+        env:
+          PYTHON_EXECUTABLE: ${{ github.workspace }}/demo/procurement/.venv/bin/python
+        run: |
+          npm --prefix scripts ci
+          ./scripts/node_modules/.bin/playwright install --with-deps chromium
+          node scripts/verify_frontend.mjs --production
+          node scripts/verify_frontend_edgecases.mjs
+          node scripts/verify_item_hierarchy.mjs
+          node scripts/verify_model_settings.mjs
+      - name: Real graph parity
+        env:
+          NEO4J_URI: bolt://127.0.0.1:7687
+          NEO4J_PASSWORD: ci-ephemeral-graph
+          DATABASE_PATH: ${{ github.workspace }}/results/ci-graph.db
+          UPLOAD_DIR: ${{ github.workspace }}/results/ci-graph-uploads
+        run: demo/procurement/.venv/bin/python scripts/sync_graph.py --dataset official-reference
+      - name: Clean source bundle check
+        run: |
+          demo/procurement/.venv/bin/python scripts/package_release.py
+          demo/procurement/.venv/bin/python scripts/verify_release.py
+      - name: Build Docker images
+        run: docker compose --env-file .env -f demo/procurement/docker-compose.yml build

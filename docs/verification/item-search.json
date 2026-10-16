@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "scope": "Live backend and frontend; exact screenshot dataset and copied-model inputs; all writes and external requests forbidden",
+  "checks": [
+    {
+      "input": "`MES3200",
+      "dataset": "default",
+      "total": 1
+    },
+    {
+      "input": "`MES3200`",
+      "dataset": "default",
+      "total": 1
+    },
+    {
+      "input": "  MES3200  ",
+      "dataset": "default",
+      "total": 1
+    },
+    {
+      "query": "广东南方通信建设有限公司",
+      "dataset": "default",
+      "total": 1
+    }
+  ],
+  "modelRequests": 0,
+  "consoleErrors": [],
+  "blockedRequests": [],
+  "finished": "2026-10-16T10:25:32.786Z"
+}

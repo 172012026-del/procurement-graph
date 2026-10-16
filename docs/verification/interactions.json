@@ -1,0 +1,37 @@
+{
+  "scope": "Read-only race and keyboard tests; fresh isolated fixtures with deliberately delayed responses",
+  "checks": [
+    {
+      "name": "delayed item search cannot overwrite a different dataset",
+      "passed": true
+    },
+    {
+      "name": "changing the query subject invalidates an in-flight relationship result",
+      "passed": true
+    },
+    {
+      "name": "closing a graph while data is loading does not render into a disposed view",
+      "passed": true
+    },
+    {
+      "name": "skip link focuses the current page without changing the route",
+      "passed": true
+    },
+    {
+      "name": "mobile keeps both exports accessible and supplier selection controls within the viewport",
+      "passed": true
+    },
+    {
+      "name": "unapplied invalid filters do not break workspace refresh; navigation returns to the top",
+      "passed": true
+    },
+    {
+      "name": "visual refinements keep tab markers, sticky controls and reduced motion working",
+      "passed": true
+    }
+  ],
+  "consoleErrors": [],
+  "blockedRequests": [],
+  "passed": true,
+  "finished": "2026-10-16T10:35:28.584Z"
+}

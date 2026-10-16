@@ -1,0 +1,19 @@
+* text=auto
+*.py text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+*.vue text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.md text eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.pdf binary
+*.docx binary
+*.pptx binary
+*.xlsx binary
+*.zip binary
+*.mp4 binary
+# Preserve source bytes referenced by the bundled sample checksums.
+demo/procurement/data/demo/html/*.html -text -whitespace

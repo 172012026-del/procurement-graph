@@ -1,0 +1,255 @@
+{
+  "selection": "12 PDF-header files spread over size quantiles, 15KB to 2MB; read pages 1,2,3,last where present",
+  "sample_count": 12,
+  "checks": [
+    {
+      "uuid": "t20260510_26542466",
+      "member": "评审情况.pdf",
+      "bytes": 23936,
+      "pages": 1,
+      "sampled_pages": [
+        1
+      ],
+      "text_characters": [
+        6
+      ],
+      "status": "ok",
+      "reader_warning_count": 0,
+      "reader_warning_examples": []
+    },
+    {
+      "uuid": "t20260610_26727619",
+      "member": "投标明细表.pdf",
+      "bytes": 91629,
+      "pages": 2,
+      "sampled_pages": [
+        1,
+        2
+      ],
+      "text_characters": [
+        951,
+        635
+      ],
+      "status": "ok",
+      "reader_warning_count": 0,
+      "reader_warning_examples": []
+    },
+    {
+      "uuid": "t20260710_26909988",
+      "member": "合同包1：报价明细附件（深圳市深远数据技术有限公司）.pdf",
+      "bytes": 116381,
+      "pages": 1,
+      "sampled_pages": [
+        1
+      ],
+      "text_characters": [
+        669
+      ],
+      "status": "ok",
+      "reader_warning_count": 0,
+      "reader_warning_examples": []
+    },
+    {
+      "uuid": "t20260810_27107103",
+      "member": "报价明细表(第1轮-山东正云信息科技有限公司).pdf",
+      "bytes": 138329,
+      "pages": 1,
+      "sampled_pages": [
+        1
+      ],
+      "text_characters": [
+        457
+      ],
+      "status": "ok",
+      "reader_warning_count": 0,
+      "reader_warning_examples": []
+    },
+    {
+      "uuid": "t20260409_26379232",
+      "member": "分项报价表-2包.pdf",
+      "bytes": 167948,
+      "pages": 2,
+      "sampled_pages": [
+        1,
+        2
+      ],
+      "text_characters": [
+        1261,
+        71
+      ],
+      "status": "ok",
+      "reader_warning_count": 802,
+      "reader_warning_examples": [
+        "Ignoring wrong pointing object 92 0 (offset 0)",
+        "Ignoring wrong pointing object 93 0 (offset 0)"
+      ]
+    },
+    {
+      "uuid": "t20260610_26727829",
+      "member": "中小企业声明函.pdf",
+      "bytes": 216471,
+      "pages": 2,
+      "sampled_pages": [
+        1,
+        2
+      ],
+      "text_characters": [
+        1384,
+        172
+      ],
+      "status": "ok",
+      "reader_warning_count": 0,
+      "reader_warning_examples": []
+    },
+    {
+      "uuid": "t20260803_27062992",
+      "member": "数字资源附件.pdf",
+      "bytes": 302264,
+      "pages": 4,
+      "sampled_pages": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "text_characters": [
+        13,
+        4,
+        4,
+        4
+      ],
+      "status": "ok",
+      "reader_warning_count": 0,
+      "reader_warning_examples": []
+    },
+    {
+      "uuid": "t20260209_26163031",
+      "member": "合同包1：中小企业或残疾人福利单位声明函（中国移动通信集团广东有限公司）.pdf",
+      "bytes": 421233,
+      "pages": 1,
+      "sampled_pages": [
+        1
+      ],
+      "text_characters": [
+        860
+      ],
+      "status": "ok",
+      "reader_warning_count": 212,
+      "reader_warning_examples": [
+        "Ignoring wrong pointing object 75 0 (offset 0)",
+        "Ignoring wrong pointing object 76 0 (offset 0)"
+      ]
+    },
+    {
+      "uuid": "t20260805_27080791",
+      "member": "山东省政府采购评审劳务报酬支付表.pdf",
+      "bytes": 525990,
+      "pages": 1,
+      "sampled_pages": [
+        1
+      ],
+      "text_characters": [
+        0
+      ],
+      "status": "ok",
+      "reader_warning_count": 0,
+      "reader_warning_examples": []
+    },
+    {
+      "uuid": "t20260709_26905803",
+      "member": "一标段、二标段本国化产品声明、价格明细表（品牌型号制造商）.pdf",
+      "bytes": 684889,
+      "pages": 8,
+      "sampled_pages": [
+        1,
+        2,
+        3,
+        8
+      ],
+      "text_characters": [
+        12,
+        0,
+        20,
+        0
+      ],
+      "status": "ok",
+      "reader_warning_count": 0,
+      "reader_warning_examples": []
+    },
+    {
+      "uuid": "t20260202_26140146",
+      "member": "采购文件正文.pdf",
+      "bytes": 935921,
+      "pages": 145,
+      "sampled_pages": [
+        1,
+        2,
+        3,
+        145
+      ],
+      "text_characters": [
+        143,
+        303,
+        848,
+        350
+      ],
+      "status": "ok",
+      "reader_warning_count": 0,
+      "reader_warning_examples": []
+    },
+    {
+      "uuid": "t20260511_26547297",
+      "member": "合同包1：中小企业或残疾人福利单位声明函（广州市宏方网络科技有限公司）.pdf",
+      "bytes": 1983603,
+      "pages": 1,
+      "sampled_pages": [
+        1
+      ],
+      "text_characters": [
+        1130
+      ],
+      "status": "ok",
+      "reader_warning_count": 0,
+      "reader_warning_examples": []
+    }
+  ],
+  "nonstandard_header_groups": {
+    "其他网页片段": 50,
+    "系统维护页面": 31,
+    "Word导出HTML": 4,
+    "其他未知格式": 6
+  },
+  "examples": {
+    "其他网页片段": {
+      "uuid": "t20260203_26146584",
+      "extension": ".docx",
+      "bytes": 9857,
+      "text_excerpt": "无障碍 $( function() { $(\"#searchSelect .title\").bind(\"click\", function(event) { $(this).next().toggle(); event.stopPropagation(); })"
+    },
+    "系统维护页面": {
+      "uuid": "t20260206_26154814",
+      "extension": ".zip",
+      "bytes": 557,
+      "text_excerpt": "系统正在维护中，请稍后... 返回首页 刷 新"
+    },
+    "Word导出HTML": {
+      "uuid": "t20260304_26217046",
+      "extension": ".doc",
+      "bytes": 4143,
+      "text_excerpt": "投标人得分排序表 项目名称：中国科协信息中心网络专线租用服务采购项目 项目编号：GC-FGX260027 第1包： 投标人编号 得分 名次 GC-FGX260027-20260211MNARD 100.00 1 GC-FGX260027-20260210XMN"
+    },
+    "其他未知格式": {
+      "uuid": "t20260609_26714099",
+      "extension": ".pdf",
+      "bytes": 291,
+      "text_excerpt": "� 猇*J-,M-.馤Q睷JN6ON10K�5荡0�5I23諱2O2�5050LK33OILNT襋*.MNN-.V睯K�)N誕释O)虸鮇蘉汃lZ麚蒇�涑厠熗閩诘�#3�$�(-1﹁辄]�6<[别檐楹Ovt控��蕐诤骈��P{r~ H棏眮亼P$hb:鼐山O鑫"
+    }
+  },
+  "scope": "Not a full PDF corpus validation or OCR assessment",
+  "visual_check": {
+    "uuid": "t20260409_26379232",
+    "member": "分项报价表-2包.pdf",
+    "page": 2,
+    "finding": "Rendered page is primarily signatures/seals, not a product detail table; low text count alone does not prove missing target fields."
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "scope": "Isolated fake credentials; provider HTTP forbidden",
+  "checks": [
+    {
+      "name": "first save persists settings and enables manual extraction without a model call",
+      "passed": true
+    },
+    {
+      "name": "reopening and reloading keep metadata without exposing saved key",
+      "passed": true
+    },
+    {
+      "name": "blank key preserves stored credential while changing model",
+      "passed": true
+    },
+    {
+      "name": "a fresh backend loads saved address model and credential status",
+      "passed": true
+    },
+    {
+      "name": "mobile configuration fields and save control remain usable",
+      "passed": true
+    }
+  ],
+  "modelRequests": 0,
+  "version": "2.4.0",
+  "passed": true,
+  "finished": "2026-10-16T10:36:10.369Z",
+  "runtime": "results/model-settings-ui/2026-10-16T10-36-00-095Z"
+}

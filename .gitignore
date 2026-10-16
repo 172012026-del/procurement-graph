@@ -1,0 +1,46 @@
+# Credentials and local settings
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+config/*.local.json
+**/model-settings.local.json
+**/.model-settings-*.local.json
+
+# Dependencies and generated files
+**/.venv/
+**/node_modules/
+**/__pycache__/
+**/.pytest_cache/
+**/.test-work/
+**/dist/
+*.py[cod]
+*.log
+.cache/
+.DS_Store
+**/.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local data and generated results
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+demo/procurement/data/uploads/
+results/
+deliverables/
+
+# Full inputs and native parsing runtimes stay local
+data/official-benchmark/html/
+data/official-benchmark/file/
+data/official-benchmark/indexes/sources-and-checksums.json
+tools/downloads/
+tools/sevenzip/
+tools/libreoffice/

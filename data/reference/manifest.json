@@ -1,0 +1,131 @@
+{
+  "selection_seed": 20261015,
+  "candidate_notices": 73,
+  "reference_status": "programmatic-source-check-human-review-pending",
+  "scope": "20 source-anchored standard goods-table announcements; excludes attachment/service/scanning validation",
+  "sha256": "e780b32d0cf3a5279d65f377d4f2d0fb25e1d3a25e80eb71ba7a6be3793e177b",
+  "records": [
+    {
+      "notice_uuid": "t20260209_26161445",
+      "split": "diagnostic",
+      "items": 2,
+      "source_sha256": "cfb1a1c15cd00d3461be495a95bbede54b7c6f41c31f5f0b5e92110c97cadc66"
+    },
+    {
+      "notice_uuid": "t20260701_26852163",
+      "split": "diagnostic",
+      "items": 7,
+      "source_sha256": "687aed8e1928b99a2dff3f3ed308761aae74a008b46f667cf4b37010f00c7ed7"
+    },
+    {
+      "notice_uuid": "t20260512_26551404",
+      "split": "diagnostic",
+      "items": 3,
+      "source_sha256": "73805d64e37bec2a49279eb688120a732019aa6fb96b121eecaa693315e1bca0"
+    },
+    {
+      "notice_uuid": "t20260409_26380023",
+      "split": "diagnostic",
+      "items": 6,
+      "source_sha256": "4bd2c7b355c0f2aaae193df3f3b059ad0e85b4ffa95fd3bb254d83d78dc1660e"
+    },
+    {
+      "notice_uuid": "t20260807_27093889",
+      "split": "diagnostic",
+      "items": 7,
+      "source_sha256": "35f1aac9a41376dc322c02a4806561c0814a56b1bbe2a770a7de6cb616212e20"
+    },
+    {
+      "notice_uuid": "t20260311_26256690",
+      "split": "diagnostic",
+      "items": 2,
+      "source_sha256": "2178819551d417b4794f6088cc4ffaa1a5df3148ddac7bcb77dee986ab6196c0"
+    },
+    {
+      "notice_uuid": "t20260702_26855564",
+      "split": "diagnostic",
+      "items": 2,
+      "source_sha256": "5dbbbed12b755720699250a6736bb7224a8ff8ca160c2d79a4c768d4f3b80521"
+    },
+    {
+      "notice_uuid": "t20260310_26254830",
+      "split": "diagnostic",
+      "items": 7,
+      "source_sha256": "b4adb3fa4da5f3764439183973ad1243ad1082949f3a0186631b73c2f200f022"
+    },
+    {
+      "notice_uuid": "t20260212_26174259",
+      "split": "diagnostic",
+      "items": 2,
+      "source_sha256": "5c3c9f6086404db88cc4a3c6db44ed8d81da5bead8444b352ff8b768c8466674"
+    },
+    {
+      "notice_uuid": "t20260509_26533549",
+      "split": "diagnostic",
+      "items": 2,
+      "source_sha256": "ffedab1c86f7e6063017e29728e85aff2c94b892e3eba7db62528ab556107056"
+    },
+    {
+      "notice_uuid": "t20260809_27099966",
+      "split": "holdout",
+      "items": 1,
+      "source_sha256": "d341f35b7a6820c42458cc017b10b0d124419c87cd2c1ccba9c3d1051db6a73e"
+    },
+    {
+      "notice_uuid": "t20260407_26367707",
+      "split": "holdout",
+      "items": 5,
+      "source_sha256": "03d4b6e994085f672e86606525149f18b6a566944a2e695541cd701a48df6e6c"
+    },
+    {
+      "notice_uuid": "t20260212_26175071",
+      "split": "holdout",
+      "items": 2,
+      "source_sha256": "cc68909a55d0d29eb8b603e08539ca49736c28f37ad282494689c5247787d290"
+    },
+    {
+      "notice_uuid": "t20260508_26524308",
+      "split": "holdout",
+      "items": 2,
+      "source_sha256": "90cfa85409494c7310ed414e3256a3f0870ae252978dc7f67852e0ee53bf8ec7"
+    },
+    {
+      "notice_uuid": "t20260609_26718001",
+      "split": "holdout",
+      "items": 5,
+      "source_sha256": "13b965ec4c22c8048a008dae3e669a41997633ce14884d40affb5809f8756709"
+    },
+    {
+      "notice_uuid": "t20260601_26661712",
+      "split": "holdout",
+      "items": 8,
+      "source_sha256": "af2d797b4fc6f64c45a99b3a1c7ccb61490477ef287221f0651fea50d42ce8bf"
+    },
+    {
+      "notice_uuid": "t20260612_26740585",
+      "split": "holdout",
+      "items": 2,
+      "source_sha256": "256fdcfcb6a44bc4fcab13b0f3771eef58eb919b362c11bd4f360dbac5c2b808"
+    },
+    {
+      "notice_uuid": "t20260305_26231783",
+      "split": "holdout",
+      "items": 7,
+      "source_sha256": "43e787966375899d660572623510578f49bd11e338768cba5c81a96034d98220"
+    },
+    {
+      "notice_uuid": "t20260303_26212365",
+      "split": "holdout",
+      "items": 5,
+      "source_sha256": "3ce9a6dff4419f013378d7659e69195552c2e2f00c6382cbc2a5061d6cc95761"
+    },
+    {
+      "notice_uuid": "t20260610_26725891",
+      "split": "holdout",
+      "items": 2,
+      "source_sha256": "81910287d207d9d8fac8f0db6308b023b62bb9a2d50947c5650c08f9aabf1a05"
+    }
+  ],
+  "initial_draft_sha256": "708b8fc2286998f74b03ae774ef70a1c815a8a1f0514eaf2ad36b6b9e794f3b4",
+  "frozen_before_experiment_predictions": true
+}

@@ -1,0 +1,30 @@
+{
+  "scope": "Synthetic source-grounded cases in isolated services; no official accuracy or model-speed claim",
+  "checks": [
+    {
+      "name": "confirmed group shows summary, two details and all evidence checks",
+      "passed": true
+    },
+    {
+      "name": "detail evidence opens the program-grounded source row",
+      "passed": true
+    },
+    {
+      "name": "detail workbook keeps three official sheets and all uncertain rows",
+      "passed": true
+    },
+    {
+      "name": "supplier conflict keeps all rows and explains the failed check",
+      "passed": true
+    },
+    {
+      "name": "mobile hierarchy and source controls remain within the panel",
+      "passed": true
+    }
+  ],
+  "modelRequests": 0,
+  "version": "2.4.0",
+  "passed": true,
+  "finished": "2026-10-16T10:34:23.422Z",
+  "runtime": "results/ui-hierarchy/2026-10-16T10-34-12-538Z"
+}
