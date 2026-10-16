@@ -9,6 +9,7 @@ import shutil
 import time
 import uuid
 from contextlib import asynccontextmanager
+from typing import Literal
 from urllib.parse import urlsplit
 
 from fastapi import BackgroundTasks, Depends, FastAPI, File, Form, HTTPException, Query, Request, UploadFile
@@ -267,7 +268,7 @@ def retry(job_id: str,background_tasks: BackgroundTasks):
 
 
 @app.get('/api/projects')
-def projects(q: str='',purchaser: str='',page: int=Query(1,ge=1),page_size: int=Query(20,ge=1,le=100),dataset_id: str=Depends(dataset)):
+def projects(q: str='',purchaser: str='',page: int=Query(1,ge=1),page_size: int=Query(20,ge=1,le=100),dataset_id: str=Depends(dataset),sort: Literal['announcement_date','imported_at']='announcement_date'):
     filters,params = ['p.dataset_id=?'],[dataset_id]
     if q:
         filters.append('(p.name LIKE ? OR p.project_code LIKE ? OR p.notice_uuid LIKE ? OR p.lot_name LIKE ?)')
@@ -275,10 +276,12 @@ def projects(q: str='',purchaser: str='',page: int=Query(1,ge=1),page_size: int=
     if purchaser:
         filters.append('p.purchaser=?'); params.append(normalize_org(purchaser))
     where = ' AND '.join(filters)
+    order = {'announcement_date':'p.announcement_date DESC,p.id DESC',
+             'imported_at':'p.created_at DESC,p.id DESC'}[sort]
     total = one(f'SELECT COUNT(*) count FROM projects p WHERE {where}',tuple(params))['count']
     data = rows(f"""SELECT p.*,(SELECT COUNT(*) FROM bids b WHERE b.project_id=p.id) bidder_count,
         (SELECT GROUP_CONCAT(b.bidder,'；') FROM bids b WHERE b.project_id=p.id AND b.is_winner=1 AND b.eligible=1) winners
-        FROM projects p WHERE {where} ORDER BY p.announcement_date DESC,p.id DESC LIMIT ? OFFSET ?""",tuple(params)+(page_size,(page-1)*page_size))
+        FROM projects p WHERE {where} ORDER BY {order} LIMIT ? OFFSET ?""",tuple(params)+(page_size,(page-1)*page_size))
     return {'total':total,'page':page,'page_size':page_size,'data':data}
 
 

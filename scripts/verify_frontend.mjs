@@ -132,13 +132,18 @@ try {
     await page.getByRole('button', { name: '开始处理', exact: true }).hover(); assert.equal(await page.getByRole('button', { name: '开始处理', exact: true }).evaluate(element => getComputedStyle(element).color), 'rgb(255, 255, 255)')
     report.parseJob = await waitNewJob(() => page.getByRole('button', { name: '开始处理', exact: true }).click(), 'parse-only'); assert.equal(report.parseJob.total, 20); assert.equal(report.parseJob.failed, 0); await screenshot('import-desktop')
   })
-  await check('uploaded archive replay, retry, per-batch workbook and quality download', async () => {
-    await page.getByLabel('处理方式', { exact: true }).selectOption('replay'); report.replayJob = await waitNewJob(() => page.getByRole('button', { name: '开始处理', exact: true }).click(), 'replay'); assert.equal(report.replayJob.total, 20); assert.equal(report.replayJob.failed, 0)
-    report.retryJob = await waitNewJob(() => page.getByRole('button', { name: '重新处理此批', exact: true }).click(), 'replay'); assert.equal(report.retryJob.failed, 0)
-    await download(page.getByRole('button', { name: '下载此批三表', exact: true }), 'procurement-batch-tables.xlsx'); await download(page.getByRole('button', { name: '此批处理说明', exact: true }), 'batch-quality.json')
+  await check('old-rule cache replay and retry fail explicitly without overwriting source data', async () => {
+    const before = await json('stats?dataset_id=official-reference')
+    await page.getByLabel('处理方式', { exact: true }).selectOption('replay'); report.replayJob = await waitNewJob(() => page.getByRole('button', { name: '开始处理', exact: true }).click(), 'replay'); assert.equal(report.replayJob.total, 20); assert.equal(report.replayJob.failed, 20)
+    assert.equal(report.replayJob.metrics.response_cache_hits, 0); assert(report.replayJob.errors.every(error => error.includes('未命中当前规则')))
+    report.retryJob = await waitNewJob(() => page.getByRole('button', { name: '重新处理此批', exact: true }).click(), 'replay'); assert.equal(report.retryJob.failed, 20)
+    assert.deepEqual(await json('stats?dataset_id=official-reference'), before)
+    report.expectedFailures.push('Old-rule response caches rejected in replay and retry; zero model HTTP calls')
+    await download(page.getByRole('button', { name: '此批处理说明', exact: true }), 'batch-quality.json')
   })
-  await check('bundled sample replay and local directory parse', async () => {
-    await page.getByRole('combobox', { name: '当前数据集', exact: true }).selectOption('official'); await page.getByRole('button', { name: '核验样本', exact: true }).click(); report.sampleJob = await waitNewJob(() => page.getByRole('button', { name: '回放核验样本', exact: true }).click(), 'replay'); assert.equal(report.sampleJob.failed, 0); assert.equal(report.sampleJob.metrics.response_cache_hits, 20); assert.equal(report.sampleJob.skipped, 0)
+  await check('bundled old-cache replay requests new extraction; local directory parse stays available', async () => {
+    await page.getByRole('combobox', { name: '当前数据集', exact: true }).selectOption('official'); await page.getByRole('button', { name: '核验样本', exact: true }).click(); report.sampleJob = await waitNewJob(() => page.getByRole('button', { name: '回放核验样本', exact: true }).click(), 'replay'); assert.equal(report.sampleJob.failed, 20); assert.equal(report.sampleJob.metrics.response_cache_hits, 0); assert.equal(report.sampleJob.skipped, 0)
+    assert(report.sampleJob.errors.every(error => error.includes('未命中当前规则'))); assert.equal((await json('stats?dataset_id=official')).projects, 0)
     await page.getByRole('button', { name: '本地基准数据', exact: true }).click(); await page.getByLabel('处理方式', { exact: true }).selectOption('parse-only'); await page.getByLabel('本次处理公告数', { exact: true }).fill('1'); report.localJob = await waitNewJob(() => page.getByRole('button', { name: '开始处理', exact: true }).click(), 'parse-only'); assert.equal(report.localJob.total, 1)
   })
   await check('dataset switch clears results and restores correct dataset', async () => {

@@ -16,11 +16,20 @@ def clean_text(text: str) -> str:
     return text.strip()
 
 
+def has_parallel_numbers(value: object) -> bool:
+    if not isinstance(value, str):
+        return False
+    parts = re.split(r'[;；]', unicodedata.normalize('NFKC', value))
+    return sum(bool(re.search(r'\d', part)) for part in parts) > 1
+
+
 def money_to_yuan(value: object) -> float | None:
     if value is None or value == "":
         return None
     if isinstance(value, (int, float)):
         return float(value) if math.isfinite(value) else None
+    if has_parallel_numbers(value):
+        return None
     raw = unicodedata.normalize("NFKC", str(value)).replace(",", "").replace("¥", "").strip()
     if re.search(r'[%‰]|费率|折扣|下浮|美元|欧元|USD|EUR',raw,re.I) or re.search(r'\d\s*(?:-|—|~|至|到)\s*\d',raw):
         return None  # A percentage/range/foreign currency cannot be treated as a disclosed yuan amount.
@@ -41,6 +50,8 @@ def number_value(value: object) -> float | None:
         return None
     if isinstance(value, (int, float)):
         return float(value) if math.isfinite(value) else None
+    if has_parallel_numbers(value):
+        return None
     match = re.search(r"-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", str(value).replace(",", ""))
     result = float(match.group()) if match else None
     return result if result is None or math.isfinite(result) else None

@@ -17,7 +17,7 @@ from .document_policy import document_role
 from .evidence import align_attachment_packages, ground_evidence
 from .models import BidExtract, ItemExtract, LotExtract, ProjectExtract
 from .normalization import dedupe_key, lot_identity, money_to_yuan, normalize_org, number_value
-from .parsers import parse_file
+from .parsers import PARSE_WARNING_PREFIX, parse_file
 from .reconciliation import reconcile_items
 from .prompts import system_prompt, user_prompt
 from .model_settings import current_settings
@@ -102,9 +102,8 @@ class DeepSeekExtractor:
                         break
                     except (ValueError,OSError):
                         pass
-            # Older runs named every document in the notice and used the raw
-            # announcement prefix. Reconstruct that exact request only for an
-            # explicit historical replay. This does not simulate a new prompt.
+            # Reconstruct legacy document context only with the CURRENT
+            # system prompt. Never fall back to old extraction rules.
             context = _replay_context.get()
             if self.cache_only and settings.extraction_strategy != 'rag' and cached is None and context and text.startswith(context['prefix']):
                 legacy = json.loads(json.dumps(payload))
@@ -135,7 +134,7 @@ class DeepSeekExtractor:
                         usage['response_cache_hits'] += 1
                 else:
                     if self.cache_only:
-                        raise FatalModelError('历史响应缓存未命中；回放模式禁止联网，未产生模型请求')
+                        raise FatalModelError('历史响应缓存未命中当前规则，请使用模型抽取重新生成结果；回放模式禁止联网，未产生模型请求')
                     if not settings.model_network_enabled:
                         raise FatalModelError('模型网络调用已暂停；请先确定样本与预算，再明确启用 MODEL_NETWORK_ENABLED')
                     if self.client is None:
@@ -241,6 +240,8 @@ class DeepSeekExtractor:
                 if _usage.get() is not None:
                     _usage.get()['parse_seconds'] += round(time.perf_counter() - parse_started, 4)
                 parsed.append(text)
+                errors.extend(f'{names[index]}: {line[len(PARSE_WARNING_PREFIX):]}'
+                              for line in text.splitlines() if line.startswith(PARSE_WARNING_PREFIX))
             except Exception as exc:
                 errors.append(f'{names[index]}: {type(exc).__name__}: {str(exc)[:180]}')
                 continue
@@ -341,12 +342,20 @@ def merge_results(results: list[ProjectExtract]) -> ProjectExtract:
                 # Only a source row identity can justify merging. Values alone cannot.
                 page_only = re.fullmatch(r'\[?PAGE:\s*\d+\]?', item.line_id, re.I)
                 item_key = (lot.lot_key,item.source_file,item.line_id,normalize_org(item.supplier)) if item.source_file and item.line_id and not page_only else None
-                if item_key and item_key in item_positions:
-                    _fill(item_positions[item_key],item,list(ItemExtract.model_fields),merged.warnings,'标的')
+                bucket = item_positions.get(item_key, []) if item_key else []
+                compatible = [previous for previous in bucket if all(
+                    not getattr(previous, field) or not getattr(item, field)
+                    or dedupe_key(getattr(previous, field)) == dedupe_key(getattr(item, field))
+                    for field in ('product_name', 'model'))]
+                if len(compatible) == 1:
+                    _fill(compatible[0],item,list(ItemExtract.model_fields),merged.warnings,'标的')
                 else:
                     lot.items.append(item)
                     if item_key:
-                        item_positions[item_key] = item
+                        if bucket:
+                            merged.processing_status = 'partial'
+                            merged.warnings.append('同一原文行对应多件或身份不明确的货物，保留独立记录，不按共同定位强行合并，需核验')
+                        item_positions.setdefault(item_key, []).append(item)
             for bid in part.bids:
                 bid = bid.model_copy(deep=True)
                 bid.bidder = normalize_org(bid.bidder)
@@ -376,6 +385,7 @@ def merge_results(results: list[ProjectExtract]) -> ProjectExtract:
 
 
 def validate_result(result: ProjectExtract) -> None:
+    result.collect_numeric_warnings()
     result.purchaser = normalize_org(result.purchaser)
     for lot in result.assign_lot_keys():
         lot.lot_name = lot.lot_name.strip()

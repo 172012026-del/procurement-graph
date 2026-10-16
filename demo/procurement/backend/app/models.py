@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, PrivateAttr, field_validator, model_validator
 
-from .normalization import disclosed_text, lot_identity, money_to_yuan, number_value, review_status
+from .normalization import disclosed_text, has_parallel_numbers, lot_identity, money_to_yuan, number_value, review_status
 
 
 class ExtractionModel(BaseModel):
@@ -24,6 +24,7 @@ class ExtractionModel(BaseModel):
 
 
 class ItemExtract(ExtractionModel):
+    _normalization_warnings: list[str] = PrivateAttr(default_factory=list)
     lot_name: str = ""
     line_id: str = ""
     product_name: str = ""
@@ -44,6 +45,18 @@ class ItemExtract(ExtractionModel):
     business_line_id: str = ""  # Source business code; never a unique row key by itself.
     related_sources: list[dict[str, str]] = Field(default_factory=list)
     source_context: dict[str, str] = Field(default_factory=dict)
+
+    @model_validator(mode='wrap')
+    @classmethod
+    def flag_parallel_numbers(cls, values, handler):
+        item = handler(values)
+        if isinstance(values, dict):
+            for field, label in (('unit_price', '单价'), ('quantity', '数量'), ('total_price', '总价')):
+                if has_parallel_numbers(values.get(field)):
+                    message = f'标的“{item.product_name or "未命名"}”的{label}含分号并列数值，已置空而非取第一段，需拆分核验：{str(values[field])[:240]}'
+                    if message not in item._normalization_warnings:
+                        item._normalization_warnings.append(message)
+        return item
 
     @field_validator('product_name', 'category', 'brand', 'model', mode='before')
     @classmethod
@@ -177,6 +190,16 @@ class ProjectExtract(ExtractionModel):
     no_target_reason: str = ""
     input_hash: str = ""
     model_usage: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode='after')
+    def collect_numeric_warnings(self):
+        warnings = [warning for item in [*self.items, *(item for lot in self.lots for item in lot.items)]
+                    for warning in item._normalization_warnings]
+        if warnings:
+            self.warnings = list(dict.fromkeys([*self.warnings, *warnings]))
+            if self.processing_status == 'complete':
+                self.processing_status = 'partial'
+        return self
 
     @field_validator("budget_amount", "awarded_amount", mode="before")
     @classmethod

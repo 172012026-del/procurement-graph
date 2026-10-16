@@ -20,9 +20,10 @@ function page(value) { w.projectPage = value; w.loadProjects(false) }
     </div>
     <section class="surface" aria-labelledby="projects-title">
       <div class="section-heading"><h2 id="projects-title">采购项目 <span class="count">{{ w.projectTotal }}</span></h2><button class="text-button" :disabled="w.datasetLoading" @click="w.loadDataset()">刷新数据</button></div>
-      <form class="table-toolbar" @submit.prevent="w.loadProjects()">
+      <form class="table-toolbar project-toolbar" @submit.prevent="w.loadProjects()">
         <label class="search-field has-search-icon"><AppIcon name="magnify"></AppIcon><span class="sr-only">搜索项目</span><input v-model="w.projectSearch" type="search" placeholder="搜索项目名称、编号或采购单位" :disabled="w.datasetLoading"></label>
         <label class="compact-filter"><span class="sr-only">筛选采购单位</span><select v-model="w.projectPurchaser" aria-label="筛选采购单位" :disabled="w.datasetLoading"><option value="">全部采购单位</option><option v-for="name in w.purchasers" :key="name">{{ name }}</option></select></label>
+        <label class="project-sort"><span class="sr-only">项目排序</span><select v-model="w.projectSort" aria-label="项目排序" title="导入时间指首次入库时间，重新处理不会改变" :disabled="w.datasetLoading"><option value="announcement_date">公告日期：最新在前</option><option value="imported_at">导入时间：最新在前</option></select></label>
         <button class="button" :disabled="w.datasetLoading || w.projectLoading">查询</button>
       </form>
       <div v-if="w.projectError" class="notice danger inset" role="alert">{{ w.projectError }}<button class="text-button" @click="w.loadProjects(false)">重新加载</button></div>

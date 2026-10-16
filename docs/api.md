@@ -19,7 +19,7 @@
 | GET | `/api/jobs/{id}` | 持久进度、`mode`、完整/待复核/失败/复用数、耗时、`finished` |
 | GET | `/api/jobs/{id}/documents` | 逐公告状态与错误；`page`、`page_size` 最大200 |
 | POST | `/api/jobs/{id}/retry` | 创建新批次；输入必须仍可用，完整且指纹一致的公告复用缓存 |
-| GET | `/api/projects` | 采购包列表；`q` 匹配名称、编号、UUID、包名，`purchaser`，分页 |
+| GET | `/api/projects` | 采购包列表；`q` 匹配名称、编号、UUID、包名，`purchaser`，分页；`sort=announcement_date`（默认）或 `imported_at`，均为最新在前；导入时间为首次入库时间 |
 | GET | `/api/projects/{id}` | 包详情、投标人审查、原始标的证据及 `item_hierarchy` 分层核验；受数据集约束 |
 | GET | `/api/items` | 七字段、项目名、采购单位及中标供应商综合检索；分类、品牌、完整型号、来源、采购单位、中标供应商和数值范围筛选 |
 | GET | `/api/entities` | `type=purchaser/supplier/brand/category` 主体候选 |
