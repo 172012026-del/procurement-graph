@@ -17,7 +17,6 @@ jobs:
         image: neo4j:5.26-community
         env:
           NEO4J_AUTH: neo4j/ci-ephemeral-graph
-          NEO4J_PASSWORD: ci-ephemeral-graph
         ports:
           - 7687:7687
         options: >-
