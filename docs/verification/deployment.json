@@ -1,0 +1,47 @@
+{
+  "scope": "Disposable Compose deployments; fake credentials; internal network; historical replay",
+  "passed": true,
+  "deployments": [
+    {
+      "mode": "sqlite",
+      "checks": [
+        "nginx page, built assets and API proxy",
+        "application token required",
+        "20 sample notices replayed with zero model requests",
+        "batch download contains all three standard sheets",
+        "database, job, download and saved credential survive container recreation"
+      ],
+      "model_requests": 0,
+      "version": "2.4.0",
+      "workbook_bytes": 32433,
+      "passed": true
+    },
+    {
+      "mode": "neo4j",
+      "checks": [
+        "nginx page, built assets and API proxy",
+        "application token required",
+        "20 sample notices replayed with zero model requests",
+        "batch download contains all three standard sheets",
+        "database, job, download and saved credential survive container recreation",
+        "Neo4j volume and live graph query survive container recreation"
+      ],
+      "model_requests": 0,
+      "version": "2.4.0",
+      "graph_parity": {
+        "synced_notices": 20,
+        "packages": 26,
+        "parity_cases": 64,
+        "passed": true,
+        "model_requests": 0
+      },
+      "workbook_bytes": 32435,
+      "passed": true
+    }
+  ],
+  "temporary_image_cleanup_returncode": 0,
+  "finished_at": "2026-10-16T12:25:31.175946+00:00",
+  "verification_source_commit": "dbbb8a9f92183c175f231d7bcb3025f40c4494b6",
+  "ci_run": "https://github.com/DoTrungHuy/procurement-graph/actions/runs/38900089496",
+  "environment": "GitHub-hosted Ubuntu 24.04; not the official evaluation platform"
+}
