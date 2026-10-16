@@ -1,7 +1,7 @@
 """Check both Compose deployments with disposable volumes and offline sample replay.
 
 Requires Docker Compose. Never mounts the working database, private configuration
-or .env. Containers share an internal network with no external route.
+or .env. API and Neo4j have no external route; nginx exposes the test entrypoint.
 """
 from __future__ import annotations
 
@@ -49,7 +49,10 @@ def isolate(config: dict, project: str, scratch: Path, images: dict, graph: bool
     if not re.fullmatch(r'procurement-check-[a-f0-9]{12}-(sqlite|neo4j)', project):
         raise ValueError('Invalid disposable project name')
     config['name'] = project
-    config['networks'] = {'default': {'name': project + '-network', 'internal': True}}
+    config['networks'] = {
+        'default': {'name': project + '-network', 'internal': True},
+        'ingress': {'name': project + '-ingress'},
+    }
     config['volumes'] = {'app-data': {'name': project + '-data'}}
     if graph:
         config['volumes']['graph-data'] = {'name': project + '-graph'}
@@ -70,9 +73,9 @@ def isolate(config: dict, project: str, scratch: Path, images: dict, graph: bool
                               PARSE_CACHE_DIR='/app/data/parsed')
     if graph:
         api['environment'].update(NEO4J_URI='bolt://neo4j:7687', RELATION_BACKEND='neo4j')
-    for service, target in [('api', 8000), ('web', 80)]:
-        config['services'][service]['ports'] = [
-            {'target': target, 'published': '0', 'host_ip': '127.0.0.1', 'protocol': 'tcp'}]
+    web = config['services']['web']
+    web['networks']['ingress'] = None
+    web['ports'] = [{'target': 80, 'published': '0', 'host_ip': '127.0.0.1', 'protocol': 'tcp'}]
     return config
 
 

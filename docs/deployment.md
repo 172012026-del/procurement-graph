@@ -53,7 +53,7 @@ docker compose --env-file .env -f demo/procurement/docker-compose.yml ps
 python scripts/verify_deployment.py
 ```
 
-此命令分别启动默认SQLite版和可选Neo4j版，检查页面资源、访问令牌、20篇历史响应回放、三表下载及重建容器后的数据和模型配置保留。使用临时卷、随机本机端口、假凭据和禁止外部路由的容器网络，不读取私有 `.env` 或挂载现有业务数据；结束时删除该次测试容器和卷。报告保存到 `results/deployment-check/verification.json`。GitHub Actions运行同一检查；这不代替官方目标平台的性能验收。
+此命令分别启动默认SQLite版和可选Neo4j版，检查页面资源、访问令牌、20篇历史响应回放、三表下载及重建容器后的数据和模型配置保留。使用临时卷、随机本机端口和假凭据；业务服务没有外部路由，仅网页端通过独立网络提供本机测试入口。不读取私有 `.env` 或挂载现有业务数据，结束时删除该次测试容器和卷。报告保存到 `results/deployment-check/verification.json`。GitHub Actions运行同一检查；这不代替官方目标平台的性能验收。
 
 ## 模型资源
 

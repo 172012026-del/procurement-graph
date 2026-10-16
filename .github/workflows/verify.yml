@@ -79,7 +79,7 @@ jobs:
         run: python scripts/verify_deployment.py
       - name: Upload deployment verification
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: deployment-verification
           path: results/deployment-check/verification.json
