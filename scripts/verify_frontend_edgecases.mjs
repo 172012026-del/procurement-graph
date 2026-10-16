@@ -80,6 +80,23 @@ try {
     const durations = await page.locator('.primary-nav').evaluate(element => getComputedStyle(element, '::before').transitionDuration)
     assert(durations.split(',').every(value => parseFloat(value) === 0)); await page.getByRole('button', { name: '收起关系网络', exact: true }).click()
   })
+  await check('project sorting resets pagination and survives refresh and reload', async () => {
+    await page.setViewportSize({ width: 1440, height: 1000 }); await navigate('overview')
+    await page.getByRole('button', { name: '项目下一页', exact: true }).click(); await page.getByText('11–20 / 26 条', { exact: true }).waitFor()
+    const sorted = page.waitForResponse(response => { const url = new URL(response.url()); return url.pathname === '/api/projects' && url.searchParams.get('sort') === 'imported_at' && url.searchParams.get('page') === '1' })
+    await page.getByRole('combobox', { name: '项目排序', exact: true }).selectOption('imported_at')
+    const result = await (await sorted).json(); await page.getByText('1–10 / 26 条', { exact: true }).waitFor()
+    const titles = result.data.map(project => [project.name, project.lot_name, project.project_code].filter(Boolean).join(' · '))
+    assert.deepEqual(await page.locator('.project-link').evaluateAll(elements => elements.map(element => element.title)), titles)
+    const refreshed = page.waitForResponse(response => { const url = new URL(response.url()); return url.pathname === '/api/projects' && url.searchParams.get('sort') === 'imported_at' })
+    await page.getByRole('button', { name: '刷新数据', exact: true }).click(); await refreshed
+    await page.locator('.table-scroll[aria-busy="false"]').waitFor(); assert.equal(await page.getByRole('combobox', { name: '项目排序', exact: true }).inputValue(), 'imported_at')
+    await page.reload(); await page.getByText('1–10 / 26 条', { exact: true }).waitFor()
+    assert.equal(await page.getByRole('combobox', { name: '项目排序', exact: true }).inputValue(), 'imported_at')
+    assert.deepEqual(await page.locator('.project-link').evaluateAll(elements => elements.map(element => element.title)), titles)
+    await page.screenshot({ path: path.join(output, 'project-sort-desktop.png') })
+    await page.setViewportSize({ width: 390, height: 844 }); await page.screenshot({ path: path.join(output, 'project-sort-mobile.png') })
+  })
   assert.deepEqual(report.consoleErrors, []); assert.deepEqual(report.blockedRequests, []); report.passed = true
 } catch (error) { report.passed = false; report.error = error.stack; console.error(error); await page.screenshot({ path: path.join(output, 'edgecase-failure.png') }).catch(() => {}) }
 finally { await context.close(); await browser.close(); await fixture.stop(); report.finished = new Date().toISOString(); await fs.writeFile(path.join(output, 'edgecase-verification.json'), JSON.stringify(report, null, 2)) }

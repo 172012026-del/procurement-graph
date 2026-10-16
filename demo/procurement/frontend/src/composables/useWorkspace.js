@@ -14,12 +14,14 @@ const pageFromHash = () => {
 
 export function createWorkspace() {
   const initialDataset = stored('procurement.dataset', 'official-reference')
+  const initialProjectSort = stored('procurement.projectSort', 'announcement_date')
   const w = reactive({
     page: pageFromHash(), dataset: /^[\p{L}\p{N}_-]{1,80}$/u.test(initialDataset) ? initialDataset : 'official-reference',
     health: {}, datasets: [], samples: {}, stats: {}, purchasers: [], suppliers: [], brands: [], categories: [],
     booting: true, datasetLoading: false, connection: 'connecting', error: '', toast: '',
     settingsOpen: false, settingsBusy: false, accessToken: readToken(), exporting: false,
     projects: [], projectTotal: 0, projectPage: 1, projectPageSize: 10, projectSearch: '', projectPurchaser: '', projectLoading: false, projectError: '',
+    projectSort: ['announcement_date', 'imported_at'].includes(initialProjectSort) ? initialProjectSort : 'announcement_date',
     items: [], itemTotal: 0, itemPage: 1, itemPageSize: 20, itemSearch: '', filters: emptyFilters(), itemApplied: {}, itemLoading: false, itemError: '',
     scenario: scenarios[0].id, purchaser: '', supplier: '', selectedSuppliers: [], result: null,
     resultLoading: false, resultError: '', renderMs: null, resultParameters: null, networkOpen: false,
@@ -65,7 +67,7 @@ export function createWorkspace() {
     try {
       const params = { dataset_id: dataset }
       const [stats, projects, items, purchasers, suppliers, brands, categories, history, datasets] = await Promise.all([
-        api.stats(params), api.projects({ ...params, q: w.projectSearch, purchaser: w.projectPurchaser, page: w.projectPage, page_size: w.projectPageSize }),
+        api.stats(params), api.projects({ ...params, q: w.projectSearch, purchaser: w.projectPurchaser, sort: w.projectSort, page: w.projectPage, page_size: w.projectPageSize }),
         api.items({ ...params, ...appliedItems, page: w.itemPage, page_size: w.itemPageSize }),
         api.entities('purchaser', params), api.entities('supplier', params), api.entities('brand', params), api.entities('category', params), api.jobs(params), api.datasets()
       ])
@@ -111,7 +113,7 @@ export function createWorkspace() {
     const token = ++projectSequence, sequence = scopeSequence, dataset = w.dataset
     w.projectLoading = true; w.projectError = ''
     try {
-      const response = await api.projects({ dataset_id: dataset, q: w.projectSearch, purchaser: w.projectPurchaser, page: w.projectPage, page_size: w.projectPageSize })
+      const response = await api.projects({ dataset_id: dataset, q: w.projectSearch, purchaser: w.projectPurchaser, sort: w.projectSort, page: w.projectPage, page_size: w.projectPageSize })
       if (token === projectSequence && current(sequence, dataset)) { w.projects = response.data; w.projectTotal = response.total }
     } catch (error) { if (token === projectSequence && current(sequence, dataset)) w.projectError = fail(error) }
     finally { if (token === projectSequence && current(sequence, dataset)) w.projectLoading = false }
@@ -261,6 +263,10 @@ export function createWorkspace() {
   Object.assign(w, { navigate, initialize, loadDataset, applyToken, loadProjects, loadItems, clearFilters, openProject, closeProject,
     useExample, runScenario, captureFiles, upload, importLocal, replaySamples, retryJob, watchJob, loadJobDocuments, download,
     jobActive, canQuery, canUseExample, scenarioDefinition: definition })
+  watch(() => w.projectSort, value => {
+    remember('procurement.projectSort', value)
+    loadProjects()
+  })
   watch(() => w.dataset, async value => {
     remember('procurement.dataset', value)
     await loadDataset(true)

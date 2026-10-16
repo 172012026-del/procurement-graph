@@ -42,8 +42,7 @@ h3 { font-weight: 500; }
 .topbar-actions { width: 100%; gap: 18px; }
 .dataset-control { margin-right: auto; gap: 10px; font-size: 12px; }
 .dataset-control > span { color: #85909f; }
-.dataset-control select { background: transparent; width: 168px; font-size: 13px; color: #535f75; border-color: transparent; padding-left: 0; }
-.dataset-control select:hover { background: #f7f8fa; border-color: transparent; }
+.dataset-control select { width: 168px; min-height: 39px; padding-top: 7px; padding-bottom: 7px; border-color: transparent; font-size: 13px; color: #535f75; }
 .toolbar-divider { display: none; }
 .main-content { padding: 26px 36px 40px; max-width: 1570px; }
 .page-heading { min-height: 38px; margin-bottom: 26px; align-items: center; }
@@ -65,12 +64,21 @@ h3 { font-weight: 500; }
 .table-toolbar { padding: 0 0 19px; gap: 12px; }
 .table-toolbar .search-field { max-width: 440px; }
 .compact-filter { flex-basis: 228px; }
+.project-sort { flex: 0 0 190px; min-width: 0; }
 .has-search-icon { position: relative; }
 .has-search-icon > .app-icon { position: absolute; top: 50%; left: 12px; transform: translateY(-50%); color: #9aa3b0; width: 17px; height: 17px; pointer-events: none; }
 .has-search-icon > input { padding-left: 38px; }
-input, select { border-color: transparent; border-radius: 7px; background: #f5f7fa; min-height: 39px; color: #465164; transition: background-color 140ms, border-color 140ms, box-shadow 140ms; }
-input:hover, select:hover { background: #f0f3f8; border-color: transparent; }
-input:focus, select:focus { border-color: #b8c5e7; background: #fff; box-shadow: 0 0 0 3px #627bd812; }
+input { border-color: transparent; border-radius: 7px; background: #f5f7fa; min-height: 39px; color: #465164; transition: background-color 140ms, border-color 140ms, box-shadow 140ms; }
+input:hover { background: #f0f3f8; border-color: transparent; }
+input:focus { border-color: #b8c5e7; background: #fff; box-shadow: 0 0 0 3px #627bd812; }
+/* Match the dataset selector's filled, rounded selected-value surface everywhere. */
+select, .select-trigger { appearance: none; border: 1px solid transparent; border-radius: 10px; min-height: 39px; padding: 7px 32px 7px 11px; background-color: #f7f8fa; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23535f75' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 14px; color: #535f75; line-height: 1.5; cursor: pointer; transition: background-color 140ms, border-color 140ms, box-shadow 140ms; }
+select:hover:not(:disabled), .select-trigger:hover:not(:disabled) { background-color: #f0f3f8; border-color: transparent; }
+select:focus, .select-trigger:focus-visible, .select-trigger[aria-expanded="true"] { background-color: #f7f8fa; border-color: #b8c5e7; box-shadow: 0 0 0 3px #627bd812; }
+select:disabled, .select-trigger:disabled { background-color: #f5f7f9; color: #7a8797; cursor: not-allowed; }
+.select-trigger > [aria-hidden="true"] { display: none; }
+.page-size select { padding-right: 25px; background-position: right 6px center; }
+select option { color: var(--ink); background: #fff; }
 input::placeholder { color: #939dac; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid #99b1e6; outline-offset: 3px; }
 .button { border-color: transparent; border-radius: 7px; background: #f1f3f7; color: #5a677c; font-weight: 400; transition: background-color 140ms, color 140ms, box-shadow 140ms, transform 100ms; }
@@ -132,8 +140,6 @@ tbody tr:hover { background: #f8faff; }
 .query-entity { max-width: 590px; }
 .query-placeholder, .scenario-results { margin-top: 8px; padding-top: 23px; border-top: 1px solid #edf0f4; }
 .query-placeholder .empty-state { min-height: 210px; }
-.select-trigger { border-color: transparent; background: #f5f7fa; min-height: 39px; border-radius: 7px; color: #718198; }
-.select-trigger:hover { background: #f0f3f8; }
 .picker-popover { border-color: #e7ebf1; border-radius: 10px; padding: 12px; box-shadow: 0 8px 28px #26355016; }
 .checkbox-option { padding: 8px; font-size: 13px; border-radius: 5px; }
 .selection-chip { background: #f4f6fb; border-color: transparent; color: #6e80a2; border-radius: 5px; font-size: 12px; }
@@ -162,7 +168,6 @@ tbody tr:hover { background: #f8faff; }
 .job-surface { margin-top: 32px; }
 .job-detail { padding: 3px 0 23px; }
 .job-surface .section-heading { padding: 0 0 20px; }
-.history-select select { background: #f5f7fa; }
 .job-progress { height: 4px; }
 .job-metrics { font-size: 12px; color: #8a98ad; }
 .job-heading .cell-code { font-size: 11px; }
@@ -251,6 +256,9 @@ tbody tr:hover { background: #f8faff; }
   .table-toolbar { padding: 0 0 18px; gap: 10px; }
   .table-toolbar .search-field { max-width: none; }
   .compact-filter { flex-basis: 0; }
+  .project-toolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .project-toolbar .search-field { grid-column: 1 / -1; }
+  .project-toolbar > .button { grid-column: 1 / -1; justify-self: end; }
   .mobile-table-hint { padding: 0 0 13px; font-size: 11px; color: #8e9bb0; }
   .pagination { padding: 15px 0 4px; }
   .filter-form { padding: 0 0 18px; }
