@@ -47,6 +47,14 @@ docker compose --env-file .env -f demo/procurement/docker-compose.yml ps
 
 数据库、上传文件和页面保存的模型配置持久保存在 `demo/procurement/data`。官方全量输入由管理员放到 `data/official-benchmark/html` 和 `file`；源码内置演示不依赖这两个目录。
 
+安装Docker后，可单独验证部署：
+
+```bash
+python scripts/verify_deployment.py
+```
+
+此命令分别启动默认SQLite版和可选Neo4j版，检查页面资源、访问令牌、20篇历史响应回放、三表下载及重建容器后的数据和模型配置保留。使用临时卷、随机本机端口、假凭据和禁止外部路由的容器网络，不读取私有 `.env` 或挂载现有业务数据；结束时删除该次测试容器和卷。报告保存到 `results/deployment-check/verification.json`。GitHub Actions运行同一检查；这不代替官方目标平台的性能验收。
+
 ## 模型资源
 
 复制 `config/model-profile.example.json` 为 `config/model-profile.local.json`，填写阶段、模型标识、版本、参数规模、资源来源及证明材料位置。初赛另填高校约定的模型标准，决赛记录主办方资源；微调方案记录允许基座和自托管服务证据。模型地址、名称、Key及启用状态可在页面“连接设置”中保存，也可在首次启动前通过私有 `.env` 配置。

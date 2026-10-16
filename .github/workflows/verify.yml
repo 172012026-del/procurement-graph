@@ -64,5 +64,23 @@ jobs:
         run: |
           demo/procurement/.venv/bin/python scripts/package_release.py
           demo/procurement/.venv/bin/python scripts/verify_release.py
-      - name: Build Docker images
-        run: docker compose --env-file .env -f demo/procurement/docker-compose.yml build
+
+  deployment:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Verify SQLite and Neo4j Compose deployments
+        run: python scripts/verify_deployment.py
+      - name: Upload deployment verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-verification
+          path: results/deployment-check/verification.json
+          if-no-files-found: ignore
