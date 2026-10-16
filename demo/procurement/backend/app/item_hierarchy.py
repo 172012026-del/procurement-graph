@@ -19,7 +19,7 @@ from .normalization import money_to_yuan
 
 VERSION = 'item-hierarchy-v1'
 POLICY = '原文记录完整保留；明细视图仅折叠证据与范围均通过核验的摘要；金额一致不能单独证明包含关系'
-_LOCATION = re.compile(r'\[?(?:TABLE:\s*\d+\s+ROW:\s*\d+|SHEET:[^\]\n]+?\s+ROW:\s*\d+|(?:PAGE|IMAGE):\s*\d+\s+LINE:\s*\d+)\]?', re.I)
+_LOCATION = re.compile(r'\[?(?:(?:TABLE:\s*\d+\s+ROW:\s*\d+|SHEET:[^\]\n]+?\s+ROW:\s*\d+)(?:\s+ITEM:\s*\d+)?|(?:PAGE|IMAGE):\s*\d+\s+LINE:\s*\d+)\]?', re.I)
 _SCOPE = re.compile(r'(?:本项|该项|本品目|该品目).{0,6}(?:全部|完整).{0,8}(?:明细|清单|设备|货物|产品|内容)')
 _NEGATION = re.compile(r'不含|不包含|不包括|未包含|不属于|非本项|不适用|仅供参考|另计|已作废|废止|无效')
 

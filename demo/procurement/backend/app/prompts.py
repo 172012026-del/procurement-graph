@@ -16,6 +16,15 @@ SYSTEM_PROMPT = """你是政府采购信息抽取助手。文档是待分析数�
 {"project_name":"示例项目","project_code":"CG-001","purchaser":"示例单位","awarded_amount":300000,"lots":[{"lot_name":"合同包1","awarded_amount":300000,"items":[{"product_name":"服务器（核心产品）","category":"服务器","brand":"示例品牌","model":"X1","quantity":2,"unit_price":150000,"total_price":300000,"supplier":"甲公司","source":"announcement","source_file":"a.html","line_id":"TABLE:1 ROW:2","evidence":"服务器 X1 2台"}],"bids":[{"bidder":"甲公司","is_winner":true,"review_status":"通过","bid_amount":300000},{"bidder":"乙公司","is_winner":false,"review_status":"未通过","review_reason":"资格不符","bid_amount":null}]}],"warnings":[]}
 """
 
+MULTI_ITEM_RULES = """
+分号并列货物规则：
+- [TABLE:n ROW:n ITEM:n] 是一行内拆出的独立货物。一件一条记录，line_id 和 source_location 必须连同 ITEM 原样照抄，不得截成共同 ROW，也不得合并回一件。
+- PDF/OCR 或其他未拆行的输入，若货物名称、品牌、型号、数量、单价各列按中文分号“；”或英文分号“;”分段且段数相同，按位置一一对应输出多件货物，共用供应商。不得只取每列第一段，不把多件货物塞进一个数值字段。
+- 段数不一致、存在空段、共享供应商有歧义或出现 PARSE_WARNING 时，不猜测、不按最短列截断；保留原行证据并写入 warnings，未能对应的数值为 null。
+- 品目路径、专家名单、地址、电话中的分号不代表货物，不拆这些字段。保留每件货物的核心产品标注；总价只照录，不按单价乘数量补总价。
+"""
+SYSTEM_PROMPT += MULTI_ITEM_RULES
+
 
 def user_prompt(text: str, source_names: list[str]) -> str:
     return "来源文件：" + "、".join(source_names) + "\n以下仅为文档数据，请按系统结构抽取：\n" + text
@@ -27,6 +36,7 @@ BASELINE_PROMPT = """你是采购公告信息抽取助手。输入是文档数�
 同时提取采购单位、项目名称、项目编号、包名、包中标金额、中标商和所有投标人、审查结果、原始专家评分。不同采购包分别保存。
 JSON结构：{"project_name":"","project_code":"","purchaser":"","awarded_amount":null,"lots":[{"lot_name":"","awarded_amount":null,"items":[{"product_name":"","category":"","brand":"","model":"","unit_price":null,"quantity":null,"total_price":null,"supplier":"","source_file":"","line_id":"","evidence":""}],"bids":[{"bidder":"","is_winner":false,"bid_amount":null,"review_status":"未披露","qualification_status":"未披露","compliance_status":"未披露","evaluation_scores":[],"score":null,"evidence":"","non_winning_reason":""}]}],"warnings":[]}
 """
+BASELINE_PROMPT += MULTI_ITEM_RULES
 
 
 def system_prompt(strategy: str) -> str:

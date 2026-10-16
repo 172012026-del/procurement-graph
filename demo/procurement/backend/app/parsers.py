@@ -26,7 +26,10 @@ from .config import WORKSPACE, settings
 from .normalization import clean_text
 
 SUPPORTED = {'.html','.htm','.pdf','.doc','.docx','.xls','.xlsx','.txt','.csv','.png','.jpg','.jpeg','.webp','.wps','.rtf'}
-PARSER_VERSION = 'parse-v3.3'
+PARSER_VERSION = 'parse-v3.4'
+PARSE_WARNING_PREFIX = '[PARSE_WARNING] '
+_GOODS_FIELDS = ('货物名称', '货物品牌', '货物型号', '货物数量', '货物单价')
+_ITEM_SEPARATOR = re.compile(r'[；;]')
 NOTICE_ID = re.compile(r'^t\d{8}_\d+$')
 _PARSE_SLOTS = threading.BoundedSemaphore(settings.parse_concurrency)
 
@@ -250,6 +253,41 @@ def _bounded_join(parts) -> str:
     return '\n'.join(result)
 
 
+def _table_rows(rows: Iterable[tuple[int, list[str]]], table_index: int) -> Iterable[str]:
+    """Split only fully aligned goods columns; shared cells keep their text."""
+    columns = {}
+    width = 0
+    for row_index, cells in rows:
+        if not any(cell.strip() for cell in cells):
+            continue
+        location = f'TABLE:{table_index} ROW:{row_index}'
+        labels = [re.sub(r'\s+', '', cell) for cell in cells]
+        header = {field: [index for index, label in enumerate(labels) if label.startswith(field)]
+                  for field in _GOODS_FIELDS}
+        if any(header.values()):
+            columns = {field: indices[0] for field, indices in header.items() if len(indices) == 1}
+            if len(columns) != len(_GOODS_FIELDS) or len(set(columns.values())) != len(_GOODS_FIELDS):
+                columns = {}
+            width = len(cells)
+        elif columns and columns['货物名称'] < len(cells) and _ITEM_SEPARATOR.search(cells[columns['货物名称']]):
+            parts = {field: [part.strip() for part in _ITEM_SEPARATOR.split(cells[index])]
+                     for field, index in columns.items() if index < len(cells)}
+            count = len(parts['货物名称'])
+            shared = [cell for index, cell in enumerate(cells) if index not in columns.values()]
+            aligned = (len(cells) == width and len(parts) == len(_GOODS_FIELDS)
+                       and all(len(values) == count and all(values) for values in parts.values())
+                       and not any(_ITEM_SEPARATOR.search(cell) for cell in shared))
+            if aligned:
+                for item_index in range(count):
+                    item = list(cells)
+                    for field, index in columns.items():
+                        item[index] = parts[field][item_index]
+                    yield f'[{location} ITEM:{item_index+1}] ' + ' | '.join(item)
+                continue
+            yield PARSE_WARNING_PREFIX + f'表{table_index}第{row_index}行：货物分号并列的列数、空值或共享字段无法严格对应，保留原行未拆分，需核验'
+        yield f'[{location}] ' + ' | '.join(cells)
+
+
 def _html(path: Path) -> str:
     soup = BeautifulSoup(decode_text(path.read_bytes()),'lxml')
     if any(word in soup.get_text() for word in ('系统正在维护中','Access Denied','403 Forbidden','404 Not Found')):
@@ -264,7 +302,7 @@ def _html(path: Path) -> str:
     for index, table in enumerate(list(soup.find_all('table')),1):
         if table.find('table'):
             continue
-        chunks = []
+        rows = []
         pending = {}
         for row_index, tr in enumerate(table.find_all('tr'),1):
             cells = []
@@ -283,8 +321,9 @@ def _html(path: Path) -> str:
             while (row_index,col) in pending:
                 cells.append(pending[(row_index,col)]); col += 1
             if cells:
-                chunks.append(f'[TABLE:{index} ROW:{row_index}] '+' | '.join(cells))
-        table.replace_with(soup.new_string('\n' + '\n'.join(chunks) + '\n'))
+                rows.append((row_index, cells))
+        chunks = _bounded_join(_table_rows(rows, index))
+        table.replace_with(soup.new_string('\n' + chunks + '\n'))
     return _bounded_join([soup.get_text('\n',strip=True)])
 
 
@@ -389,8 +428,9 @@ def _docx(path: Path) -> str:
                 chunks.append(text)
         elif node.tag.endswith('}tbl'):
             table_index += 1
-            for index,row in enumerate(Table(node,document).rows,1):
-                chunks.append(f'[TABLE:{table_index} ROW:{index}] '+' | '.join(c.text.strip() for c in row.cells))
+            rows = ((index, [cell.text.strip() for cell in row.cells])
+                    for index, row in enumerate(Table(node, document).rows, 1))
+            chunks.append(_bounded_join(_table_rows(rows, table_index)))
         image_chunks(node)
     return _bounded_join(chunks)
 

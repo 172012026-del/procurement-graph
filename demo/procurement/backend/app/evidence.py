@@ -11,7 +11,7 @@ from .models import ProjectExtract
 from .normalization import dedupe_key, lot_identity, normalize_org
 from .item_hierarchy import make_context
 
-LOCATION = re.compile(r'\[?(TABLE:\s*\d+\s+ROW:\s*\d+|SHEET:[^\]\n]+?\s+ROW:\s*\d+|PAGE:\s*\d+\s+LINE:\s*\d+|IMAGE:\s*\d+\s+LINE:\s*\d+)\]?', re.I)
+LOCATION = re.compile(r'\[?((?:TABLE:\s*\d+\s+ROW:\s*\d+|SHEET:[^\]\n]+?\s+ROW:\s*\d+)(?:\s+ITEM:\s*\d+)?|PAGE:\s*\d+\s+LINE:\s*\d+|IMAGE:\s*\d+\s+LINE:\s*\d+)\]?', re.I)
 PACKAGE = re.compile(r'^(?:(?:合同包|采购包|包组|标包|标段|包)\s*[（(]?[0-9A-Za-z一二三四五六七八九十百零〇两]+|第?[0-9A-Za-z一二三四五六七八九十百零〇两]+(?:标段|标包|包))')
 
 
