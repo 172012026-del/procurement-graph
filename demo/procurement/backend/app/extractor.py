@@ -22,7 +22,7 @@ from .reconciliation import reconcile_items
 from .prompts import system_prompt, user_prompt
 from .model_settings import current_settings
 
-PIPELINE_VERSION = 'package-v2.8'
+PIPELINE_VERSION = 'package-v2.9'
 _usage: ContextVar[dict | None] = ContextVar('extraction_usage', default=None)
 _replay_context: ContextVar[dict | None] = ContextVar('replay_context', default=None)
 
@@ -307,11 +307,15 @@ def _fill(target, source, fields: list[str], warnings: list[str], label: str) ->
     def missing(value):
         return value is None or value == '' or value == [] or value == {}
     for field in fields:
+        if field == 'model_key':
+            continue
         old, new = getattr(target,field), getattr(source,field)
         if missing(old) and not missing(new):
             setattr(target,field,new)
         elif not missing(old) and not missing(new) and old != new:
             warnings.append(f'{label}字段冲突: {field}，保留先前原文值待复核')
+    if isinstance(target, ItemExtract):
+        target.align_model_key()
 
 
 def merge_results(results: list[ProjectExtract]) -> ProjectExtract:
@@ -346,7 +350,10 @@ def merge_results(results: list[ProjectExtract]) -> ProjectExtract:
                 compatible = [previous for previous in bucket if all(
                     not getattr(previous, field) or not getattr(item, field)
                     or dedupe_key(getattr(previous, field)) == dedupe_key(getattr(item, field))
-                    for field in ('product_name', 'model'))]
+                    for field in ('product_name', 'model', 'brand', 'category', 'quantity_unit'))
+                    and all(getattr(previous, field) is None or getattr(item, field) is None
+                            or getattr(previous, field) == getattr(item, field)
+                            for field in ('quantity', 'unit_price', 'total_price'))]
                 if len(compatible) == 1:
                     _fill(compatible[0],item,list(ItemExtract.model_fields),merged.warnings,'标的')
                 else:
@@ -396,6 +403,7 @@ def validate_result(result: ProjectExtract) -> None:
             if bid.is_winner and not bid.eligible:
                 result.warnings.append('投标记录同时标记中标和审查失败，已排除有效关系，待复核')
         for item in lot.items:
+            item.align_model_key()
             item.derived_values = {}
             item.lot_name = lot.lot_name
             item.supplier = normalize_org(item.supplier)

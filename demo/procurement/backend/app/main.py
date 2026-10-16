@@ -26,7 +26,7 @@ from .ingestion import local_groups
 from .jobs import create_job, get_job, interrupt_running_jobs, process_job, retry_job, save_uploads
 from .models import ItemExtract, LocalIngestRequest, LotExtract, ProjectExtract
 from .item_hierarchy import analyze_lot
-from .normalization import normalize_org
+from .normalization import model_match_key, normalize_org
 from .parsers import office_tool, seven_zip
 from .ocr import available as ocr_available
 from .seed import seed_demo, seed_reference
@@ -332,7 +332,10 @@ def items(q: str='',category: str='',brand: str='',model: str='',source: str='',
                    'p.name','p.purchaser','i.winner_supplier')
         filters.append('('+' OR '.join(f'CAST({c} AS TEXT) LIKE ?' for c in columns)+')')
         params.extend([f'%{q}%']*len(columns))
-    for column,value in (('i.category',category),('i.brand',brand),('i.model',model),('i.source',source),('p.purchaser',purchaser),('i.winner_supplier',supplier)):
+    model_key = model_match_key(model)
+    if model_key:
+        filters.append('i.model_key=?'); params.append(model_key)
+    for column,value in (('i.category',category),('i.brand',brand),('i.source',source),('p.purchaser',purchaser),('i.winner_supplier',supplier)):
         if value:
             filters.append(f'{column}=?'); params.append(value)
     for column,minimum,maximum in (('i.unit_price',min_price,max_price),('i.quantity',min_quantity,max_quantity),('i.total_price',min_total,max_total)):

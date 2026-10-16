@@ -15,7 +15,7 @@ from pypdf import PdfWriter
 
 from app import analytics,database,jobs,ingestion,main
 from app.config import settings
-from app.database import init_db,one,rows,upsert_notice
+from app.database import connect,init_db,one,rows,upsert_notice
 from app.evaluate import evaluate,score_items
 from app.exports import HEADERS,workbook_bytes,export_records
 from app.extractor import DeepSeekExtractor,chunk_text,merge_results,validate_result
@@ -169,6 +169,13 @@ def test_pdf_disguised_as_docx_is_detected(tmp_path):
     assert detect_type(path)=='.pdf'
     with pytest.raises(ParseError): parse_file(path)
 
+def test_html_line_break_inside_model_does_not_invent_a_space(tmp_path):
+    path = tmp_path / 'notice.html'
+    path.write_text('<table><tr><td>终端管理器</td><td><span>DH-ITSE0400-TA</span><br> <span>-N02</span></td><td>Model A B</td></tr></table>', encoding='utf-8')
+    text = parse_file(path)
+    assert '终端管理器 | DH-ITSE0400-TA-N02 | Model A B' in text
+
+
 def test_html_merged_cells_keep_row_ownership(tmp_path):
     path=tmp_path/'test.html'; path.write_text('<table><tr><td rowspan="2">包1</td><td>产品甲</td></tr><tr><td>产品乙</td></tr></table>',encoding='utf-8')
     text=parse_file(path)
@@ -306,6 +313,34 @@ def test_evaluation_requires_explicit_predictions(tmp_path):
 @pytest.mark.parametrize('url',['/api/projects?page=0','/api/items?page_size=-1','/api/items?min_price=-1','/api/entities?type=invalid','/api/graph?limit=0','/api/stats?dataset_id=../outside'])
 def test_api_input_validation(client,url):
     assert client.get(url).status_code==422
+
+def test_model_filter_ignores_whitespace_and_keeps_source_text(client,notice):
+    record = notice()
+    record.items[0] = record.items[0].model_copy(update={'model': 'DH-ITSE0400-TA -N02'})
+    upsert_notice(record, ['n.html'], 'official')
+    stored = one('SELECT model, model_key FROM items')
+    assert stored['model'] == 'DH-ITSE0400-TA -N02'
+    assert stored['model_key'] == 'DH-ITSE0400-TA-N02'
+    exact = client.get('/api/items', params={'dataset_id': 'official', 'model': 'DH-ITSE0400-TA-N02'})
+    spaced = client.get('/api/items', params={'dataset_id': 'official', 'model': 'DH-ITSE0400-TA -N02'})
+    other = client.get('/api/items', params={'dataset_id': 'official', 'model': 'DH-ITSE0400-TB-N02'})
+    assert exact.json()['total'] == spaced.json()['total'] == 1
+    assert exact.json()['data'][0]['model'] == 'DH-ITSE0400-TA -N02'
+    assert other.json()['total'] == 0
+
+
+def test_existing_model_rows_get_match_keys(tmp_path, monkeypatch):
+    target = tmp_path / 'legacy.db'
+    monkeypatch.setattr(database, 'settings', replace(settings, database_path=target))
+    init_db()
+    with connect() as connection:
+        connection.execute("INSERT INTO projects(name) VALUES('旧项目')")
+        project_id = connection.execute('SELECT id FROM projects').fetchone()['id']
+        connection.execute("INSERT INTO items(project_id, model, model_key) VALUES(?, 'DH-ITSE0400-TA -N02', '')", (project_id,))
+    init_db()
+    assert one("SELECT model FROM items")['model'] == 'DH-ITSE0400-TA -N02'
+    assert one("SELECT model_key FROM items")['model_key'] == 'DH-ITSE0400-TA-N02'
+
 
 def test_api_numeric_filters_and_dataset_scope(client,notice):
     upsert_notice(notice(),['n.html'],'official')
